@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+{% block title %}Recepción — FitLife{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root{--bg:#08080a;--surface:#0a0c12;--card:#10121a;--border:#1e2230;--accent:#58a6ff;--text:#e8e8e8;--muted:#566;--green:#3fb950}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;min-height:100vh}
+.sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border)}
+.wm{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:#f5a623}
+.wm span{color:var(--text)}
+.role-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.2);color:var(--accent);font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 10px;border-radius:20px;margin-top:6px;text-transform:uppercase}
+.sidebar-nav{flex:1;padding:16px 0}
+.nav-section{padding:12px 20px 6px;font-size:10px;font-weight:700;color:#334;letter-spacing:2px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 20px;color:#667;font-size:14px;font-weight:500;text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.nav-item:hover,.nav-item.active{color:var(--text);background:rgba(88,166,255,.04);border-left-color:var(--accent)}
+.nav-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-user{padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.user-info .name{font-size:13px;font-weight:600;color:var(--text)}
+.user-info .rol{font-size:11px;color:var(--muted)}
+.btn-logout{margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:5px 8px;cursor:pointer;font-size:12px;text-decoration:none;transition:all .2s}
+.btn-logout:hover{border-color:#ff4d4d;color:#ff4d4d}
+.main{flex:1;display:flex;flex-direction:column}
+.topbar{padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px}
+.date-chip{background:var(--card);border:1px solid var(--border);padding:6px 14px;border-radius:6px;font-size:12px;color:var(--muted)}
+.content{padding:28px 32px;flex:1}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;border-top:2px solid var(--accent);transition:transform .2s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-icon{font-size:24px;margin-bottom:10px}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:38px;line-height:1;color:var(--accent);margin-bottom:4px}
+.stat-lbl{font-size:12px;color:var(--muted)}
+.quick-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:14px}
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.quick-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:22px;text-decoration:none;color:var(--text);transition:border-color .2s,transform .2s;display:flex;align-items:center;gap:14px}
+.quick-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.qc-icon{font-size:32px;width:52px;height:52px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qc-name{font-weight:700;font-size:15px;margin-bottom:3px}
+.qc-desc{font-size:12px;color:var(--muted)}
+.venc-alert{background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.2);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:10px;color:#ff8080;font-size:13px;margin-bottom:24px}
+</style>
+{% endblock %}
+
+{% block body %}
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="wm">Fit<span>Life</span></div>
+    <div class="role-chip">🗂️ Recepcionista</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a href="{{ path('recepcionista_dashboard') }}" class="nav-item active">
+      <span class="nav-icon">📊</span> Dashboard
+    </a>
+    <div class="nav-section">Clientes</div>
+    <a href="#" class="nav-item"><span class="nav-icon">👤</span> Nuevo cliente</a>
+    <a href="#" class="nav-item"><span class="nav-icon">📋</span> Lista de clientes</a>
+    <div class="nav-section">Operaciones</div>
+    <a href="#" class="nav-item"><span class="nav-icon">🏷️</span> Membresías</a>
+    <a href="#" class="nav-item"><span class="nav-icon">💳</span> Registrar pago</a>
+    <a href="#" class="nav-item"><span class="nav-icon">✅</span> Asistencia</a>
+    <a href="#" class="nav-item"><span class="nav-icon">📝</span> Inscribir a clase</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">{{ usuario.nombre|first|upper }}</div>
+    <div class="user-info">
+      <div class="name">{{ usuario.nombre }}</div>
+      <div class="rol">Recepcionista</div>
+    </div>
+    <a href="{{ path('app_logout') }}" class="btn-logout" title="Cerrar sesión">⎋</a>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">Recepción — {{ usuario.nombre }}</div>
+    <div class="date-chip">📅 {{ "now"|date("d/m/Y H:i") }}</div>
+  </div>
+  <div class="content">
+    {% if stats.membresias_venc > 0 %}
+    <div class="venc-alert">
+      ⚠️ <strong>{{ stats.membresias_venc }} membresías</strong> vencen en los próximos 3 días. Contacta a los clientes.
+    </div>
+    {% endif %}
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">🚶</div>
+        <div class="stat-val">{{ stats.clientes_hoy }}</div>
+        <div class="stat-lbl">Entradas hoy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💳</div>
+        <div class="stat-val">{{ stats.pagos_hoy }}</div>
+        <div class="stat-lbl">Pagos registrados hoy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-val">{{ stats.membresias_venc }}</div>
+        <div class="stat-lbl">Membresías por vencer</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-val">{{ stats.asistencias }}</div>
+        <div class="stat-lbl">Asistencias del día</div>
+      </div>
+    </div>
+
+    <div class="quick-title">Acciones Rápidas</div>
+    <div class="quick-grid">
+      <a href="#" class="quick-card">
+        <div class="qc-icon">👤</div>
+        <div><div class="qc-name">Registrar cliente</div><div class="qc-desc">Alta de nuevo miembro con cédula y datos</div></div>
+      </a>
+      <a href="#" class="quick-card">
+        <div class="qc-icon">💳</div>
+        <div><div class="qc-name">Registrar pago</div><div class="qc-desc">Cobro de membresía en efectivo o tarjeta</div></div>
+      </a>
+      <a href="#" class="quick-card">
+        <div class="qc-icon">✅</div>
+        <div><div class="qc-name">Marcar asistencia</div><div class="qc-desc">Registrar entrada y salida del día</div></div>
+      </a>
+      <a href="#" class="quick-card">
+        <div class="qc-icon">📝</div>
+        <div><div class="qc-name">Inscribir a clase</div><div class="qc-desc">Añadir cliente a una clase grupal</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

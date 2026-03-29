@@ -1,0 +1,263 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FitLife — Acceso Empleados{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root{--bg:#08080a;--card:#111114;--border:#222228;--accent:#f5a623;--text:#e8e8e8;--muted:#666;--err:#ff4d4d}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  position:relative;overflow:hidden;
+}
+
+/* Fondo con efecto de luz */
+body::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 55% 55% at 20% 30%, rgba(245,166,35,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 85% 80%, rgba(245,166,35,.04) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+/* Grid de fondo decorativo */
+body::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+}
+
+/* ── CONTENEDOR ── */
+.login-wrap{
+  position:relative;z-index:1;
+  width:100%;max-width:420px;
+  padding:24px;
+}
+
+/* Logo arriba */
+.login-logo{
+  text-align:center;margin-bottom:32px;
+}
+.login-logo .wordmark{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px;letter-spacing:4px;
+  color:var(--accent);
+  text-shadow:0 0 40px rgba(245,166,35,.35);
+  display:block;line-height:1;
+}
+.login-logo .wordmark span{color:var(--text)}
+.login-logo .sub{
+  color:var(--muted);font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;margin-top:4px;
+}
+
+/* Card del formulario */
+.login-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:36px 32px;
+  box-shadow:0 24px 64px rgba(0,0,0,.6);
+}
+.login-card-header{
+  margin-bottom:28px;
+}
+.login-card-title{
+  font-size:20px;font-weight:700;color:var(--text);
+  display:flex;align-items:center;gap:10px;
+}
+.lock-icon{
+  width:36px;height:36px;
+  background:rgba(245,166,35,.12);
+  border:1px solid rgba(245,166,35,.25);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.login-card-sub{color:var(--muted);font-size:13px;margin-top:6px}
+
+/* Campos */
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-size:12px;font-weight:600;
+  color:#888;letter-spacing:.8px;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.field-wrap{position:relative}
+.field-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:15px;color:var(--muted);pointer-events:none;
+}
+.field input{
+  width:100%;
+  background:#0d0d10;
+  border:1px solid var(--border);
+  border-radius:8px;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  padding:13px 14px 13px 42px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.field input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(245,166,35,.1);
+}
+.field input::placeholder{color:#333}
+
+/* Error */
+.alert-error{
+  background:rgba(255,77,77,.08);
+  border:1px solid rgba(255,77,77,.25);
+  border-radius:8px;
+  padding:12px 16px;
+  color:var(--err);
+  font-size:13px;
+  margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* Remember */
+.remember-row{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:24px;
+}
+.remember-row input[type=checkbox]{
+  width:16px;height:16px;accent-color:var(--accent);cursor:pointer;
+}
+.remember-row label{font-size:13px;color:var(--muted);cursor:pointer}
+
+/* Botón */
+.btn-login{
+  width:100%;
+  background:var(--accent);
+  color:#000;
+  border:none;
+  border-radius:9px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;
+  letter-spacing:2px;
+  padding:15px;
+  cursor:pointer;
+  transition:opacity .2s,transform .15s;
+}
+.btn-login:hover{opacity:.88;transform:translateY(-1px)}
+.btn-login:active{transform:translateY(0)}
+
+/* Footer del card */
+.login-footer{
+  text-align:center;margin-top:24px;
+  color:var(--muted);font-size:12px;
+}
+.login-footer a{color:var(--accent);text-decoration:none}
+.login-footer a:hover{text-decoration:underline}
+
+/* Roles badge */
+.roles-hint{
+  display:flex;justify-content:center;gap:8px;
+  margin-top:20px;
+}
+.role-badge{
+  font-size:10px;font-weight:600;letter-spacing:.8px;
+  padding:4px 10px;border-radius:20px;
+  text-transform:uppercase;
+}
+.rb-admin{background:rgba(245,166,35,.1);color:var(--accent);border:1px solid rgba(245,166,35,.2)}
+.rb-recep{background:rgba(88,166,255,.08);color:#58a6ff;border:1px solid rgba(88,166,255,.2)}
+.rb-instr{background:rgba(63,185,80,.08);color:#3fb950;border:1px solid rgba(63,185,80,.2)}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="login-wrap">
+
+  <!-- Logo -->
+  <div class="login-logo">
+    <span class="wordmark">Fit<span>Life</span></span>
+    <div class="sub">Panel de Empleados</div>
+  </div>
+
+  <!-- Card -->
+  <div class="login-card">
+    <div class="login-card-header">
+      <div class="login-card-title">
+        <div class="lock-icon">🔐</div>
+        Acceso al Sistema
+      </div>
+      <p class="login-card-sub">Ingresa tus credenciales de empleado</p>
+    </div>
+
+    <!-- Error -->
+    {% if error %}
+      <div class="alert-error">
+        ⚠️ {{ error.messageKey|trans(error.messageData, 'security') }}
+      </div>
+    {% endif %}
+
+    <!-- Formulario -->
+    <form method="post" action="{{ path('app_login') }}" autocomplete="off">
+
+      <div class="field">
+        <label for="usuario">Usuario</label>
+        <div class="field-wrap">
+          <span class="field-icon">👤</span>
+          <input
+            type="text"
+            id="usuario"
+            name="usuario"
+            value="{{ last_username }}"
+            placeholder="tu_usuario"
+            autocomplete="username"
+            required
+            autofocus
+          >
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="contrasena">Contraseña</label>
+        <div class="field-wrap">
+          <span class="field-icon">🔑</span>
+          <input
+            type="password"
+            id="contrasena"
+            name="contrasena"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="remember-row">
+        <input type="checkbox" id="remember" name="_remember_me">
+        <label for="remember">Recordar sesión por 7 días</label>
+      </div>
+
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+      <button type="submit" class="btn-login">Ingresar →</button>
+    </form>
+  </div>
+
+  <!-- Roles disponibles (informativo) -->
+  <div class="roles-hint">
+    <span class="role-badge rb-admin">Administrador</span>
+    <span class="role-badge rb-recep">Recepcionista</span>
+    <span class="role-badge rb-instr">Instructor</span>
+  </div>
+
+  <div class="login-footer">
+    <a href="{{ path('app_home') }}">← Volver al sitio web</a>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+security:
+
+    # ── Hasher: algoritmo para contraseñas ──────────────────────────────
+    password_hashers:
+        App\Entity\Personal:
+            id: App\Security\Sha256PasswordHasher  # Hasher personalizado para SHA2(256)
+
+    # ── Provider: cómo se carga el usuario desde BD ─────────────────────
+    providers:
+        app_personal_provider:
+            entity:
+                class: App\Entity\Personal
+                property: usuario   # campo usado para buscar el usuario
+
+    # ── Firewalls ────────────────────────────────────────────────────────
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            lazy: true
+            provider: app_personal_provider
+            custom_authenticator: App\Security\AppAuthenticator
+            logout:
+                path: app_logout
+                target: app_home    # al cerrar sesión va al home público
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800    # 7 días en segundos
+                path: /
+
+    # ── Control de acceso por ruta ───────────────────────────────────────
+    access_control:
+        # Rutas públicas (sin autenticación)
+        - { path: ^/login$,   roles: PUBLIC_ACCESS }
+        - { path: ^/$,        roles: PUBLIC_ACCESS }
+
+        # Panel administrador
+        - { path: ^/admin,        roles: ROLE_ADMIN }
+
+        # Panel recepcionista
+        - { path: ^/recepcionista, roles: ROLE_RECEPCIONISTA }
+
+        # Panel instructor
+        - { path: ^/instructor,   roles: ROLE_INSTRUCTOR }
+
+    # ── Jerarquía de roles ───────────────────────────────────────────────
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_RECEPCIONISTA, ROLE_INSTRUCTOR]

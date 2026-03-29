@@ -1,0 +1,514 @@
+{% extends 'base.html.twig' %}
+{% block title %}FitLife — Tu Gimnasio de Alto Rendimiento{% endblock %}
+{% block stylesheets %}
+<style>
+/* ============================================= */
+/* ESTILOS EXACTOS BASADOS EN ONELIFEFITNESS.COM.BO */
+/* (negro profundo, amarillo vibrante #FFEA00, transiciones suaves) */
+/* ============================================= */
+
+:root {
+  --bg: #0a0a0a;
+  --text: #ffffff;
+  --muted: #aaaaaa;
+  --accent: #FFEA00;
+  --dark: #111111;
+  --border: #222222;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NAVBAR (inicialmente transparente, cambia al hacer scroll) ── */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: transparent;          /* Transparente al inicio */
+  backdrop-filter: none;
+  border-bottom: none;
+  padding: 0 60px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estilos cuando se ha hecho scroll */
+nav.scrolled {
+  background: rgba(61, 59, 59, 0.18);      /* Fondo oscuro semi-transparente (opaco) */
+  backdrop-filter: blur(12px);
+  border-bottom: none;
+  border-radius: 60px;                 /* Bordes redondeados */
+  width: calc(100% - 40px);            /* Reduce el ancho para no ir de esquina a esquina */
+  left: 20px;                          /* Centrado horizontal */
+  top: 10px;                           /* Separación superior */
+  padding: 0 40px;                     /* Ajuste de padding para mantener el contenido */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Ajustes de colores para navbar en estado scrolled (texto visible sobre fondo oscuro) */
+nav.scrolled .nav-logo {
+  color: var(--accent);
+}
+nav.scrolled .nav-logo span {
+  color: #fff;
+}
+nav.scrolled .nav-links a {
+  color: #e0e0e0;
+}
+nav.scrolled .nav-links a:hover {
+  color: var(--accent);
+}
+nav.scrolled .btn-nav {
+  background: var(--accent);
+  color: #000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.nav-logo span { color: var(--text); }
+
+.nav-links {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+.nav-links a:hover { color: var(--accent); }
+
+.btn-nav {
+  background: var(--accent);
+  color: #000;
+  padding: 12px 32px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 234, 0, 0.3);
+}
+.btn-nav:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 234, 0, 0.4);
+}
+
+/* ── HERO con imagen de fondo temática de gimnasio (MÁS GRANDE) ── */
+.hero {
+  min-height: 100vh;
+  padding-top: 80px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(18,8,0,0.8) 100%),
+              url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+  background-size: 150% auto;        /* Imagen más grande (zoom) */
+  background-position: center 30%;   /* Reposiciona para mantener el foco */
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 40%, rgba(255,234,0,.12) 0%, transparent 70%);
+  z-index: 1;
+  pointer-events: none;
+}
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 60px;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  display: inline-block;
+  background: rgba(255,234,0,.15);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  padding: 8px 24px;
+  border-radius: 50px;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(68px, 9vw, 130px);
+  line-height: 0.9;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+.hero h1 span { color: var(--accent); }
+
+.hero p {
+  font-size: 20px;
+  color: var(--muted);
+  max-width: 620px;
+  margin: 0 auto 48px;
+  line-height: 1.5;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+  padding: 18px 48px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 18px;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 30px rgba(255,234,0,.4);
+}
+.btn-primary:hover {
+  transform: scale(1.08) translateY(-4px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  padding: 18px 48px;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 18px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── SECCIONES GENERALES ── */
+section {
+  padding: 120px 60px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.section-tag {
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 6vw, 72px);
+  line-height: 1;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.section-sub {
+  color: var(--muted);
+  font-size: 19px;
+  max-width: 580px;
+  line-height: 1.5;
+}
+
+/* ── CLASES / DISCIPLINAS (círculos amarillos) ── */
+.clases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  margin-top: 60px;
+}
+.clase-card {
+  background: var(--dark);
+  border-radius: 20px;
+  padding: 32px 20px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border);
+}
+.clase-card:hover {
+  transform: translateY(-12px);
+  border-color: var(--accent);
+  box-shadow: 0 20px 40px rgba(255,234,0,.15);
+}
+.clase-icon {
+  width: 90px;
+  height: 90px;
+  background: var(--accent);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  margin: 0 auto 24px;
+  transition: all 0.3s ease;
+}
+.clase-card:hover .clase-icon {
+  transform: scale(1.15);
+}
+.clase-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.clase-horario {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ── PRECIOS (tarjetas amarillas) ── */
+.precios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 40px;
+  margin-top: 80px;
+}
+.precio-card {
+  background: var(--accent);
+  color: #000;
+  border-radius: 24px;
+  padding: 48px 40px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 15px 40px rgba(0,0,0,.3);
+}
+.precio-card:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 30px 60px rgba(255,234,0,.3);
+}
+.precio-card.destacado {
+  border: 6px solid #000;
+  transform: scale(1.04);
+}
+.precio-nombre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.precio-monto {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 72px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.precio-period {
+  font-size: 18px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+.precio-features {
+  list-style: none;
+  margin: 40px 0;
+}
+.precio-features li {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0,0,0,.15);
+  font-size: 17px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.precio-features li::before {
+  content: "✓";
+  color: #000;
+  font-weight: 900;
+}
+.btn-plan {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 18px;
+  background: #000;
+  color: var(--accent);
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  text-decoration: none;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+.btn-plan:hover {
+  background: #111;
+  transform: scale(1.05);
+}
+
+/* ── CTA FINAL ── */
+.cta-section {
+  background: linear-gradient(135deg, #111111, #000000);
+  padding: 140px 60px;
+  text-align: center;
+}
+.cta-section h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 7vw, 90px);
+  line-height: 1;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.cta-section h2 span { color: var(--accent); }
+.cta-section p {
+  font-size: 22px;
+  color: var(--muted);
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: #111111;
+  padding: 80px 60px 40px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+footer strong { color: var(--accent); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  nav { padding: 0 24px; height: 70px; }
+  nav.scrolled { padding: 0 24px; width: calc(100% - 20px); left: 10px; border-radius: 30px; }
+  .nav-links { gap: 20px; font-size: 14px; }
+  .hero-content, section { padding-left: 24px; padding-right: 24px; }
+  .precios-grid { grid-template-columns: 1fr; }
+}
+
+/* Ajustes para que AOS no rompa el diseño */
+[data-aos] {
+  pointer-events: auto !important;
+}
+</style>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<nav id="mainNav">
+  <div class="nav-logo">Fit<span>Life</span></div>
+  <ul class="nav-links">
+    <li><a href="#clases">Clases</a></li>
+    <li><a href="#precios">Planes</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a href="#precios" class="btn-nav">Únete Ahora</a>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="hero-content" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+    <span class="hero-eyebrow">🏆 Gimnasio N°1 de la Ciudad</span>
+    <h1>Rompe tus <span>Límites.</span></h1>
+    <p>Entrenamiento de élite, instructores certificados y la comunidad más motivada. Tu transformación empieza hoy.</p>
+    <div class="hero-btns">
+      <a href="#precios" class="btn-primary">Ver Planes →</a>
+      <a href="#clases" class="btn-secondary">Nuestras Clases</a>
+    </div>
+  </div>
+</section>
+
+<section id="clases">
+  <div class="section-tag" data-aos="fade-right">Actividades</div>
+  <h2 class="section-title" data-aos="fade-right" data-aos-delay="100">Nuestras Clases</h2>
+  <p class="section-sub" data-aos="fade-right" data-aos-delay="200">Programas diseñados para todos los niveles. Desde principiantes hasta atletas avanzados.</p>
+  <div class="clases-grid">
+    {% for clase in clases %}
+    <div class="clase-card" data-aos="zoom-in" data-aos-duration="600" data-aos-delay="{{ loop.index * 100 }}">
+      <div class="clase-icon">{{ clase.icono }}</div>
+      <div class="clase-name">{{ clase.nombre }}</div>
+      <div class="clase-horario">🕐 {{ clase.horario }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="precios">
+  <div class="section-tag" data-aos="fade-right">Membresías</div>
+  <h2 class="section-title" data-aos="fade-right" data-aos-delay="100">Elige tu Plan</h2>
+  <p class="section-sub" data-aos="fade-right" data-aos-delay="200">Sin contratos a largo plazo. Cancela cuando quieras. Resultados garantizados.</p>
+  <div class="precios-grid">
+    {% for plan in planes %}
+    <div class="precio-card {{ plan.destacado ? 'destacado' : '' }}" data-aos="flip-up" data-aos-duration="800" data-aos-delay="{{ loop.index * 150 }}">
+      <div class="precio-nombre">{{ plan.nombre }}</div>
+      <div class="precio-monto">${{ plan.precio }}</div>
+      <div class="precio-period">por {{ plan.duracion }}</div>
+      <ul class="precio-features">
+        {% for f in plan.features %}
+          <li>{{ f }}</li>
+        {% endfor %}
+      </ul>
+      <a href="#contacto" class="btn-plan">Comenzar Ahora</a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="cta-section" id="contacto">
+  <h2 data-aos="fade-up">El momento es <span>AHORA.</span></h2>
+  <p data-aos="fade-up" data-aos-delay="100">Primera semana gratis para nuevos miembros. Sin excusas.</p>
+  <a href="#" class="btn-primary" data-aos="fade-up" data-aos-delay="200">Registrarse Gratis →</a>
+</div>
+
+<footer>
+  <p>© {{ "now"|date("Y") }} <strong>FitLife Gym</strong> — Todos los derechos reservados.
+     Desarrollado con <strong>Symfony {{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}</strong></p>
+</footer>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  // Inicializar AOS con configuraciones personalizadas
+  AOS.init({
+    duration: 800,
+    once: true,
+    offset: 100
+  });
+
+  // Efecto de scroll en la barra de navegación
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+  });
+</script>
+{% endblock %}
