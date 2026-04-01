@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/base.html.twig' %}
 
 {% block title %}FitLife — Acceso Empleados{% endblock %}
 
@@ -135,22 +135,38 @@ body::after{
 }
 .remember-row label{font-size:13px;color:var(--muted);cursor:pointer}
 
-/* Botón */
-.btn-login{
-  width:100%;
-  background:var(--accent);
-  color:#000;
-  border:none;
-  border-radius:9px;
-  font-family:'Bebas Neue',sans-serif;
-  font-size:20px;
-  letter-spacing:2px;
-  padding:15px;
-  cursor:pointer;
-  transition:opacity .2s,transform .15s;
+/* Contenedor para el botón con posicionamiento relativo */
+.btn-container {
+  position: relative;
+  width: 100%;
+  min-height: 60px; /* Ajusta según la altura real del botón */
 }
-.btn-login:hover{opacity:.88;transform:translateY(-1px)}
-.btn-login:active{transform:translateY(0)}
+
+/* Botón con posicionamiento absoluto y transición suave */
+.btn-login {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: top 0.2s ease-out, left 0.2s ease-out;
+  width: 100%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 9px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  padding: 15px;
+  cursor: pointer;
+  /* Conservamos los estilos de hover y active del original */
+}
+.btn-login:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+.btn-login:active {
+  transform: translateY(0);
+}
 
 /* Footer del card */
 .login-footer{
@@ -244,7 +260,10 @@ body::after{
 
       <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-      <button type="submit" class="btn-login">Ingresar →</button>
+      <!-- Botón envuelto en su contenedor para el efecto de escape -->
+      <div class="btn-container">
+        <button type="submit" class="btn-login">Ingresar →</button>
+      </div>
     </form>
   </div>
 
@@ -260,4 +279,64 @@ body::after{
   </div>
 
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const button = document.querySelector('.btn-login');
+  const container = document.querySelector('.btn-container');
+
+  if (!button || !container) return;
+
+  // Obtiene una posición aleatoria dentro de los límites del contenedor
+  function getSafePosition() {
+    const btnRect = button.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    // Espacio disponible para mover el botón
+    const maxLeft = containerRect.width - btnRect.width;
+    const maxTop = containerRect.height - btnRect.height;
+
+    // Posiciones aleatorias, asegurando que no se salga
+    let left = Math.random() * maxLeft;
+    let top = Math.random() * maxTop;
+
+    // Limitar a los bordes
+    left = Math.min(Math.max(left, 0), maxLeft);
+    top = Math.min(Math.max(top, 0), maxTop);
+
+    return { left, top };
+  }
+
+  // Mueve el botón a una nueva posición aleatoria
+  function moveButton() {
+    const { left, top } = getSafePosition();
+    button.style.left = left + 'px';
+    button.style.top = top + 'px';
+  }
+
+  // Detectar movimiento del mouse en toda la ventana
+  document.addEventListener('mousemove', function(e) {
+    const btnRect = button.getBoundingClientRect();
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    // Centro aproximado del botón
+    const btnCenterX = btnRect.left + btnRect.width / 2;
+    const btnCenterY = btnRect.top + btnRect.height / 2;
+
+    // Distancia euclidiana
+    const distance = Math.hypot(mouseX - btnCenterX, mouseY - btnCenterY);
+
+    // Si el cursor está a menos de 100px, el botón huye
+    if (distance < 100) {
+      moveButton();
+    }
+  });
+
+  // Posicionar aleatoriamente al cargar la página
+  moveButton();
+});
+</script>
 {% endblock %}

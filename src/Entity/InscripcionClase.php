@@ -18,7 +18,7 @@ class InscripcionClase
     #[ORM\JoinColumn(name: 'cliente_id', referencedColumnName: 'id', nullable: false)]
     private Cliente $cliente;
 
-    #[ORM\ManyToOne(targetEntity: Clase::class)]
+    #[ORM\ManyToOne(targetEntity: Clase::class, inversedBy: 'inscripciones')]
     #[ORM\JoinColumn(name: 'clase_id', referencedColumnName: 'id', nullable: false)]
     private Clase $clase;
 

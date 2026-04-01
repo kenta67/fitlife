@@ -1,32 +1,38 @@
-{% extends 'base.html.twig' %}
+{% extends 'layouts/instructor.html.twig' %}
+
 {% block title %}Instructor — FitLife{% endblock %}
 
+{% block page_title %}Hola, {{ app.user.nombre }} 👋{% endblock %}
+
+{% block content %}
+<div class="section-title">Mis Clases Asignadas</div>
+<div class="clases-list">
+  {% for clase in clases %}
+  {% set pct = (clase.inscritos / clase.max * 100)|round %}
+  <div class="clase-card">
+    <div class="clase-icon">🏋️</div>
+    <div class="clase-info">
+      <div class="clase-nombre">{{ clase.nombre }}</div>
+      <div class="clase-horario">🕐 {{ clase.horario }}</div>
+    </div>
+    <div class="clase-bar">
+      <div class="clase-bar-label">
+        <span>Inscritos</span>
+        <span>{{ clase.inscritos }}/{{ clase.max }}</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill {{ pct >= 80 ? 'casi-lleno' : '' }}" style="width:{{ pct }}%"></div>
+      </div>
+    </div>
+    <div class="clase-badge">{{ pct }}% ocupado</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
 {% block stylesheets %}
+{{ parent() }}
 <style>
-:root{--bg:#080a08;--surface:#0a0f0a;--card:#101510;--border:#1e281e;--accent:#3fb950;--text:#e8e8e8;--muted:#556;--orange:#f5a623}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;min-height:100vh}
-.sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
-.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border)}
-.wm{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--orange)}
-.wm span{color:var(--text)}
-.role-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.2);color:var(--accent);font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 10px;border-radius:20px;margin-top:6px;text-transform:uppercase}
-.sidebar-nav{flex:1;padding:16px 0}
-.nav-section{padding:12px 20px 6px;font-size:10px;font-weight:700;color:#344;letter-spacing:2px;text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:11px;padding:11px 20px;color:#556;font-size:14px;font-weight:500;text-decoration:none;transition:all .15s;border-left:2px solid transparent}
-.nav-item:hover,.nav-item.active{color:var(--text);background:rgba(63,185,80,.04);border-left-color:var(--accent)}
-.nav-icon{font-size:16px;width:20px;text-align:center}
-.sidebar-user{padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
-.user-info .name{font-size:13px;font-weight:600;color:var(--text)}
-.user-info .rol{font-size:11px;color:var(--muted)}
-.btn-logout{margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:5px 8px;cursor:pointer;font-size:12px;text-decoration:none;transition:all .2s}
-.btn-logout:hover{border-color:#ff4d4d;color:#ff4d4d}
-.main{flex:1;display:flex;flex-direction:column}
-.topbar{padding:20px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
-.page-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px}
-.date-chip{background:var(--card);border:1px solid var(--border);padding:6px 14px;border-radius:6px;font-size:12px;color:var(--muted)}
-.content{padding:28px 32px;flex:1}
 .section-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:14px}
 .clases-list{display:flex;flex-direction:column;gap:12px}
 .clase-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;display:flex;align-items:center;gap:20px;transition:border-color .2s}
@@ -42,63 +48,4 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 .bar-fill.casi-lleno{background:var(--orange)}
 .clase-badge{background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.2);color:var(--accent);font-size:11px;font-weight:600;padding:4px 12px;border-radius:6px;white-space:nowrap}
 </style>
-{% endblock %}
-
-{% block body %}
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="wm">Fit<span>Life</span></div>
-    <div class="role-chip">🏋️ Instructor</div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section">Principal</div>
-    <a href="{{ path('instructor_dashboard') }}" class="nav-item active">
-      <span class="nav-icon">📊</span> Mi Dashboard
-    </a>
-    <div class="nav-section">Mis Clases</div>
-    <a href="#" class="nav-item"><span class="nav-icon">🗓️</span> Horario</a>
-    <a href="#" class="nav-item"><span class="nav-icon">👥</span> Mis Inscritos</a>
-    <a href="#" class="nav-item"><span class="nav-icon">✅</span> Asistencia clase</a>
-  </nav>
-  <div class="sidebar-user">
-    <div class="user-avatar">{{ usuario.nombre|first|upper }}</div>
-    <div class="user-info">
-      <div class="name">{{ usuario.nombre }}</div>
-      <div class="rol">Instructor</div>
-    </div>
-    <a href="{{ path('app_logout') }}" class="btn-logout" title="Cerrar sesión">⎋</a>
-  </div>
-</aside>
-
-<div class="main">
-  <div class="topbar">
-    <div class="page-title">Hola, {{ usuario.nombre }} 👋</div>
-    <div class="date-chip">📅 {{ "now"|date("l, d/m/Y") }}</div>
-  </div>
-  <div class="content">
-    <div class="section-title">Mis Clases Asignadas</div>
-    <div class="clases-list">
-      {% for clase in clases %}
-      {% set pct = (clase.inscritos / clase.max * 100)|round %}
-      <div class="clase-card">
-        <div class="clase-icon">🏋️</div>
-        <div class="clase-info">
-          <div class="clase-nombre">{{ clase.nombre }}</div>
-          <div class="clase-horario">🕐 {{ clase.horario }}</div>
-        </div>
-        <div class="clase-bar">
-          <div class="clase-bar-label">
-            <span>Inscritos</span>
-            <span>{{ clase.inscritos }}/{{ clase.max }}</span>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill {{ pct >= 80 ? 'casi-lleno' : '' }}" style="width:{{ pct }}%"></div>
-          </div>
-        </div>
-        <div class="clase-badge">{{ pct }}% ocupado</div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</div>
 {% endblock %}

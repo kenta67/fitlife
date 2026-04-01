@@ -73,4 +73,57 @@ class PersonalRepository extends ServiceEntityRepository implements PasswordUpgr
     {
         return $this->count(['estado' => true]);
     }
+
+    /**
+     * Obtiene una página de personal.
+     */
+    public function findPaginated(int $offset, int $limit): array
+    {
+        return $this->createQueryBuilder('p')
+            ->orderBy('p.nombre', 'ASC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Cuenta el total de personal (sin filtros).
+     */
+    public function countAll(): int
+    {
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Cuenta cuántos empleados hay por cada rol.
+     * Retorna un array asociativo [rolNombre => cantidad].
+     */
+    public function countByRole(): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('IDENTITY(p.rol) as rol_id, COUNT(p.id) as total')
+            ->groupBy('p.rol');
+
+        $results = $qb->getQuery()->getResult();
+
+        // Obtener los nombres de los roles
+        $roles = $this->getEntityManager()->getRepository(\App\Entity\Rol::class)->findAll();
+        $roleNames = [];
+        foreach ($roles as $rol) {
+            $roleNames[$rol->getId()] = $rol->getNombre();
+        }
+
+        $counts = [];
+        foreach ($results as $row) {
+            $rolId = $row['rol_id'];
+            $name = $roleNames[$rolId] ?? 'Desconocido';
+            $counts[$name] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
 }

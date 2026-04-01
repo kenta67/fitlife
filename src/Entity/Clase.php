@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ClaseRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClaseRepository::class)]
@@ -33,6 +35,13 @@ class Clase
     #[ORM\Column(type: 'boolean')]
     private bool $estado = true;
 
+    #[ORM\OneToMany(targetEntity: InscripcionClase::class, mappedBy: 'clase')]
+    private Collection $inscripciones;
+
+    public function __construct()
+    {
+        $this->inscripciones = new ArrayCollection();
+    }
     public function getId(): ?int { return $this->id; }
     public function getNombre(): string { return $this->nombre; }
     public function setNombre(string $n): static { $this->nombre = $n; return $this; }
@@ -46,4 +55,9 @@ class Clase
     public function setHorario(?string $h): static { $this->horario = $h; return $this; }
     public function isEstado(): bool { return $this->estado; }
     public function setEstado(bool $e): static { $this->estado = $e; return $this; }
+
+    public function getInscripciones(): Collection
+    {
+        return $this->inscripciones;
+    }
 }
