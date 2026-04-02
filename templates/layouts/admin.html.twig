@@ -97,6 +97,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
       <span class="nav-icon">🏋️</span> Clases
     </a>
     
+    <a href="{{ path('admin_pagos_index') }}" class="nav-item {% if app.request.get('_route') starts with 'admin_pagos' %}active{% endif %}">
+      <span class="nav-icon">💳</span> Pagos
+    </a>
+
     <div class="nav-section">Reportes</div>
     <a href="#" class="nav-item"><span class="nav-icon">💰</span> Ingresos</a>
     <a href="#" class="nav-item"><span class="nav-icon">📈</span> Estadísticas</a>
