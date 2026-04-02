@@ -1,0 +1,65 @@
+{# templates/admin/personal/edit.html.twig #}
+{% extends 'layouts/admin.html.twig' %}
+
+{% block title %}Editar Personal - FitLife{% endblock %}
+
+{% block page_title %}Editar Empleado{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 600px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+    {{ form_start(form, {attr: {class: 'personal-form'}}) }}
+        <div class="form-group">
+            {{ form_label(form.nombre) }}
+            {{ form_widget(form.nombre, {attr: {class: 'form-control'}}) }}
+            {{ form_errors(form.nombre) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.usuario) }}
+            {{ form_widget(form.usuario, {attr: {class: 'form-control'}}) }}
+            {{ form_errors(form.usuario) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.contrasena) }}
+            {{ form_widget(form.contrasena, {attr: {class: 'form-control'}}) }}
+            <small class="form-text text-muted" style="color: var(--muted);">Dejar en blanco para no cambiar la contraseña</small>
+            {{ form_errors(form.contrasena) }}
+        </div>
+        <div class="form-group">
+            {{ form_label(form.rol) }}
+            {{ form_widget(form.rol, {attr: {class: 'form-control'}}) }}
+            {{ form_errors(form.rol) }}
+        </div>
+        <div class="form-group form-check">
+            {{ form_widget(form.estado, {attr: {class: 'form-check-input'}}) }}
+            {{ form_label(form.estado, null, {label_attr: {class: 'form-check-label'}}) }}
+            {{ form_errors(form.estado) }}
+        </div>
+
+        <div class="form-buttons" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+            <a href="{{ path('admin_personal_index') }}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">{{ action }}</button>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.form-container .form-group { margin-bottom: 1rem; }
+.form-container label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 500; color: var(--muted); }
+.form-container input[type="text"],
+.form-container input[type="password"],
+.form-container select,
+.form-container textarea { width: 100%; padding: 0.5rem 0.75rem; background-color: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); transition: border-color 0.2s; }
+.form-container input:focus,
+.form-container select:focus,
+.form-container textarea:focus { border-color: var(--accent); outline: none; }
+.form-container .form-check { display: flex; align-items: center; gap: 0.5rem; }
+.form-container .form-check input { width: auto; }
+.btn-primary { background-color: var(--accent); border: none; padding: 0.5rem 1rem; border-radius: 8px; color: #000; font-weight: 600; text-decoration: none; display: inline-block; }
+.btn-primary:hover { background-color: #e59400; color: #000; }
+.btn-secondary { background-color: #2c2c2c; border: 1px solid #444; color: #e0e0e0; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; display: inline-block; }
+.btn-secondary:hover { background-color: #3c3c3c; color: #fff; }
+</style>
+{% endblock %}

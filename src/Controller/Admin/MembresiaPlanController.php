@@ -21,7 +21,6 @@ class MembresiaPlanController extends AbstractController
     #[Route('/', name: 'admin_planes_index', methods: ['GET'])]
     public function index(MembresiaPlanRepository $repo, Request $request): Response
     {
-        // Paginación
         $page = (int) $request->query->get('page', 1);
         $limit = 10;
         $offset = ($page - 1) * $limit;
@@ -29,8 +28,6 @@ class MembresiaPlanController extends AbstractController
         $planes = $repo->findPaginated($offset, $limit);
         $total = $repo->countAll();
         $totalPages = ceil($total / $limit);
-
-        // Estadísticas
         $stats = $repo->countByStatus();
 
         return $this->render('admin/planes/index.html.twig', [
@@ -42,36 +39,7 @@ class MembresiaPlanController extends AbstractController
         ]);
     }
 
-    #[Route('/new/modal', name: 'admin_planes_new_modal', methods: ['GET'])]
-    public function newModal(): Response
-    {
-        $plan = new MembresiaPlan();
-        $form = $this->createForm(MembresiaPlanType::class, $plan, [
-            'action' => $this->generateUrl('admin_planes_new'),
-        ]);
-
-        return $this->render('admin/planes/_form_modal.html.twig', [
-            'form' => $form->createView(),
-            'title' => 'Nuevo Plan',
-            'action' => 'Crear',
-        ]);
-    }
-
-    #[Route('/{id}/edit/modal', name: 'admin_planes_edit_modal', methods: ['GET'])]
-    public function editModal(MembresiaPlan $plan): Response
-    {
-        $form = $this->createForm(MembresiaPlanType::class, $plan, [
-            'action' => $this->generateUrl('admin_planes_edit', ['id' => $plan->getId()]),
-        ]);
-
-        return $this->render('admin/planes/_form_modal.html.twig', [
-            'form' => $form->createView(),
-            'title' => 'Editar Plan',
-            'action' => 'Actualizar',
-        ]);
-    }
-
-    #[Route('/new', name: 'admin_planes_new', methods: ['POST'])]
+    #[Route('/new', name: 'admin_planes_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $plan = new MembresiaPlan();
@@ -82,14 +50,17 @@ class MembresiaPlanController extends AbstractController
             $this->em->persist($plan);
             $this->em->flush();
             $this->addFlash('success', 'Plan creado correctamente.');
-        } else {
-            $this->addFlash('error', 'Error al crear el plan. Verifique los datos.');
+            return $this->redirectToRoute('admin_planes_index');
         }
 
-        return $this->redirectToRoute('admin_planes_index');
+        return $this->render('admin/planes/new.html.twig', [
+            'form' => $form->createView(),
+            'title' => 'Nuevo Plan',
+            'action' => 'Crear',
+        ]);
     }
 
-    #[Route('/{id}/edit', name: 'admin_planes_edit', methods: ['POST'])]
+    #[Route('/{id}/edit', name: 'admin_planes_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, MembresiaPlan $plan): Response
     {
         $form = $this->createForm(MembresiaPlanType::class, $plan);
@@ -98,11 +69,15 @@ class MembresiaPlanController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->em->flush();
             $this->addFlash('success', 'Plan actualizado correctamente.');
-        } else {
-            $this->addFlash('error', 'Error al actualizar el plan. Verifique los datos.');
+            return $this->redirectToRoute('admin_planes_index');
         }
 
-        return $this->redirectToRoute('admin_planes_index');
+        return $this->render('admin/planes/edit.html.twig', [
+            'form' => $form->createView(),
+            'plan' => $plan,
+            'title' => 'Editar Plan',
+            'action' => 'Actualizar',
+        ]);
     }
 
     #[Route('/{id}/delete', name: 'admin_planes_delete', methods: ['POST'])]
@@ -115,7 +90,6 @@ class MembresiaPlanController extends AbstractController
         } else {
             $this->addFlash('error', 'Token inválido.');
         }
-
         return $this->redirectToRoute('admin_planes_index');
     }
 }

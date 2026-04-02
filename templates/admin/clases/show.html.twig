@@ -1,0 +1,67 @@
+{% extends 'layouts/admin.html.twig' %}
+
+{% block title %}Detalles de Clase - FitLife{% endblock %}
+
+{% block page_title %}Detalles de la Clase{% endblock %}
+
+{% block content %}
+<div class="details-container" style="max-width: 800px; margin: 0 auto;">
+    <div class="card" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--accent); margin-bottom: 1rem;">Información general</h3>
+        <div class="detalles-info" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div><strong>Nombre:</strong> {{ clase.nombre }}</div>
+            <div><strong>Instructor:</strong> {{ clase.instructor.nombre }}</div>
+            <div><strong>Capacidad máxima:</strong> {{ clase.capacidadMax }}</div>
+            <div><strong>Horario:</strong> {{ clase.horario }}</div>
+            <div><strong>Estado:</strong> {{ clase.estado ? 'Activa' : 'Inactiva' }}</div>
+            <div><strong>Descripción:</strong> {{ clase.descripcion ?: 'Sin descripción' }}</div>
+        </div>
+    </div>
+
+    <div class="card" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+        <h3 style="color: var(--accent); margin-bottom: 1rem;">Clientes inscritos ({{ clientes|length }})</h3>
+        {% if clientes|length > 0 %}
+            <table class="clientes-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <th style="text-align: left; padding: 10px;">ID</th>
+                        <th style="text-align: left; padding: 10px;">Nombre completo</th>
+                        <th style="text-align: left; padding: 10px;">Cédula</th>
+                        <th style="text-align: left; padding: 10px;">Teléfono</th>
+                        <th style="text-align: left; padding: 10px;">Correo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 10px;">{{ cliente.id }}</td>
+                        <td style="padding: 10px;">{{ cliente.nombre }} {{ cliente.apellido }}</td>
+                        <td style="padding: 10px;">{{ cliente.cedula }}</td>
+                        <td style="padding: 10px;">{{ cliente.telefono ?: '-' }}</td>
+                        <td style="padding: 10px;">{{ cliente.correo ?: '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted" style="color: var(--muted);">No hay clientes inscritos en esta clase.</p>
+        {% endif %}
+    </div>
+
+    <div class="action-buttons" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+        <a href="{{ path('admin_clase_edit', {id: clase.id}) }}" class="btn btn-primary">Editar Clase</a>
+        <a href="{{ path('admin_clase_index') }}" class="btn btn-secondary">Volver al listado</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.details-container .btn-primary { background-color: var(--accent); border: none; padding: 0.5rem 1rem; border-radius: 8px; color: #000; font-weight: 600; text-decoration: none; display: inline-block; }
+.details-container .btn-primary:hover { background-color: #e59400; color: #000; }
+.details-container .btn-secondary { background-color: #2c2c2c; border: 1px solid #444; color: #e0e0e0; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; display: inline-block; }
+.details-container .btn-secondary:hover { background-color: #3c3c3c; color: #fff; }
+.clientes-table th { color: var(--muted); font-weight: 600; }
+</style>
+{% endblock %}

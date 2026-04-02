@@ -25,7 +25,6 @@ class PersonalController extends AbstractController
     #[Route('/', name: 'admin_personal_index', methods: ['GET'])]
     public function index(PersonalRepository $repo, Request $request): Response
     {
-        // Paginación
         $page = (int) $request->query->get('page', 1);
         $limit = 10;
         $offset = ($page - 1) * $limit;
@@ -33,8 +32,6 @@ class PersonalController extends AbstractController
         $personales = $repo->findPaginated($offset, $limit);
         $total = $repo->countAll();
         $totalPages = ceil($total / $limit);
-
-        // Estadísticas
         $countsByRole = $repo->countByRole();
 
         return $this->render('admin/personal/index.html.twig', [
@@ -46,42 +43,11 @@ class PersonalController extends AbstractController
         ]);
     }
 
-    #[Route('/new/modal', name: 'admin_personal_new_modal', methods: ['GET'])]
-    public function newModal(): Response
-    {
-        $personal = new Personal();
-        $form = $this->createForm(PersonalType::class, $personal, [
-            'is_edit' => false,
-            'action' => $this->generateUrl('admin_personal_new'),
-        ]);
-
-        return $this->render('admin/personal/_form_modal.html.twig', [
-            'form' => $form->createView(),
-            'title' => 'Nuevo Empleado',
-            'action' => 'Crear',
-        ]);
-    }
-
-    #[Route('/{id}/edit/modal', name: 'admin_personal_edit_modal', methods: ['GET'])]
-    public function editModal(Personal $personal): Response
-    {
-        $form = $this->createForm(PersonalType::class, $personal, [
-            'is_edit' => true,
-            'action' => $this->generateUrl('admin_personal_edit', ['id' => $personal->getId()]),
-        ]);
-
-        return $this->render('admin/personal/_form_modal.html.twig', [
-            'form' => $form->createView(),
-            'title' => 'Editar Empleado',
-            'action' => 'Actualizar',
-        ]);
-    }
-
-    #[Route('/new', name: 'admin_personal_new', methods: ['POST'])]
+    #[Route('/new', name: 'admin_personal_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $personal = new Personal();
-        $form = $this->createForm(PersonalType::class, $personal);
+        $form = $this->createForm(PersonalType::class, $personal, ['is_edit' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -92,16 +58,18 @@ class PersonalController extends AbstractController
             }
             $this->em->persist($personal);
             $this->em->flush();
-
             $this->addFlash('success', 'Personal creado correctamente.');
-        } else {
-            $this->addFlash('error', 'Error al crear el personal. Verifique los datos.');
+            return $this->redirectToRoute('admin_personal_index');
         }
 
-        return $this->redirectToRoute('admin_personal_index');
+        return $this->render('admin/personal/new.html.twig', [
+            'form' => $form->createView(),
+            'title' => 'Nuevo Empleado',
+            'action' => 'Crear',
+        ]);
     }
 
-    #[Route('/{id}/edit', name: 'admin_personal_edit', methods: ['POST'])]
+    #[Route('/{id}/edit', name: 'admin_personal_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Personal $personal): Response
     {
         $form = $this->createForm(PersonalType::class, $personal, ['is_edit' => true]);
@@ -115,11 +83,15 @@ class PersonalController extends AbstractController
             }
             $this->em->flush();
             $this->addFlash('success', 'Personal actualizado correctamente.');
-        } else {
-            $this->addFlash('error', 'Error al actualizar el personal. Verifique los datos.');
+            return $this->redirectToRoute('admin_personal_index');
         }
 
-        return $this->redirectToRoute('admin_personal_index');
+        return $this->render('admin/personal/edit.html.twig', [
+            'form' => $form->createView(),
+            'personal' => $personal,
+            'title' => 'Editar Empleado',
+            'action' => 'Actualizar',
+        ]);
     }
 
     #[Route('/{id}/delete', name: 'admin_personal_delete', methods: ['POST'])]
