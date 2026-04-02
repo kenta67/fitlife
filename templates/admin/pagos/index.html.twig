@@ -1,0 +1,219 @@
+{% extends 'layouts/admin.html.twig' %}
+
+{% block title %}Gestión de Pagos - FitLife{% endblock %}
+
+{% block page_title %}Gestión de Pagos{% endblock %}
+
+{% block content %}
+<!-- Tarjetas de estadísticas -->
+<div class="stats-row">
+  <div class="stat-card c1">
+    <div class="stat-icon">💳</div>
+    <div class="stat-val">{{ stats.total }}</div>
+    <div class="stat-lbl">Pagos registrados</div>
+  </div>
+</div>
+
+<!-- Tabla de pagos -->
+<div class="table-container">
+  <table class="personal-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Membresía</th>
+        <th>Cliente</th>
+        <th>Monto (Bs)</th>
+        <th>Fecha</th>
+        <th>Método</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pago in pagos %}
+      <tr>
+        <td>{{ pago.id }}</td>
+        <td>{{ pago.membresiaCliente.plan.nombrePlan }}</td>
+        <td>{{ pago.membresiaCliente.cliente.nombre }} {{ pago.membresiaCliente.cliente.apellido }}</td>
+        <td>{{ pago.monto }}</td>
+        <td>{{ pago.fechaPago|date('d/m/Y') }}</td>
+        <td>{{ pago.metodoPago }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">No hay pagos registrados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Paginación simple -->
+<div class="pagination">
+  {% for i in 1..totalPages %}
+    <a href="?page={{ i }}" class="page-link{% if i == currentPage %} active{% endif %}">{{ i }}</a>
+  {% endfor %}
+</div>
+
+<!-- Barra de herramientas -->
+<div class="toolbar">
+  <button type="button" class="btn-new" id="btnNewPago">
+    <i class="fas fa-plus"></i> Registrar Pago
+  </button>
+</div>
+
+<!-- Modal para formulario de pago -->
+<div class="modal fade" id="pagoModal" tabindex="-1" aria-labelledby="pagoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body" id="pagoModalBody">
+        <!-- El formulario se carga aquí por AJAX -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const btn = document.getElementById('btnNewPago');
+  if (btn) {
+    btn.addEventListener('click', function() {
+      fetch('{{ path('admin_pagos_new_modal') }}')
+        .then(r => r.text())
+        .then(html => {
+          document.getElementById('pagoModalBody').innerHTML = html;
+          const modal = new bootstrap.Modal(document.getElementById('pagoModal'));
+          modal.show();
+        });
+    });
+  }
+  // Envío del formulario dentro del modal (AJAX)
+  const pagoModal = document.getElementById('pagoModal');
+  pagoModal.addEventListener('submit', function(e) {
+    if (e.target && e.target.matches('form')) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          return response.text();
+        }
+      })
+      .then(html => {
+        if (html && html.includes('error')) {
+          pagoModal.querySelector('.modal-body').innerHTML = html;
+        }
+      })
+      .catch(error => console.error(error));
+    }
+  });
+});
+</script>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+:root {
+    --bg: #1e1e2f;
+    --card: #2a2a3a;
+    --border: #3a3a4a;
+    --text: #f0f0f0;
+    --muted: #aaa;
+    --accent: #ffb347;
+}
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+}
+.stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+.stat-card .stat-icon {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+}
+.stat-card .stat-val {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+.stat-card .stat-lbl {
+    color: var(--muted);
+    font-size: 1rem;
+}
+.table-container {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 18px;
+}
+.personal-table {
+    width: 100%;
+    color: var(--text);
+    border-collapse: collapse;
+}
+.personal-table th, .personal-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+}
+.personal-table th {
+    color: var(--accent);
+    font-weight: 600;
+    background: var(--bg);
+}
+.personal-table tr:last-child td {
+    border-bottom: none;
+}
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin: 18px 0;
+}
+.btn-new {
+    background: var(--accent);
+    color: #222;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+}
+.btn-new:hover {
+    background: #ff9800;
+}
+.page-link {
+    color: var(--accent);
+    margin: 0 4px;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+}
+.page-link.active {
+    background: var(--accent);
+    color: #222;
+    font-weight: bold;
+}
+.page-link.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+</style>
+{% endblock %}

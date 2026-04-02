@@ -1,0 +1,33 @@
+<h5 class="mb-3">{{ title }}</h5>
+
+{{ form_start(form, {attr: {class: 'pago-form'}}) }}
+    <div class="form-group">
+        {{ form_label(form.membresiaCliente) }}
+        {{ form_widget(form.membresiaCliente, {attr: {class: 'form-control'}}) }}
+        {{ form_errors(form.membresiaCliente) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.personal) }}
+        {{ form_widget(form.personal, {attr: {class: 'form-control'}}) }}
+        {{ form_errors(form.personal) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.monto) }}
+        {{ form_widget(form.monto, {attr: {class: 'form-control'}}) }}
+        {{ form_errors(form.monto) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.fechaPago) }}
+        {{ form_widget(form.fechaPago, {attr: {class: 'form-control'}}) }}
+        {{ form_errors(form.fechaPago) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.metodoPago) }}
+        {{ form_widget(form.metodoPago, {attr: {class: 'form-control'}}) }}
+        {{ form_errors(form.metodoPago) }}
+    </div>
+    <div class="modal-footer px-0 pb-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-primary">{{ action }}</button>
+    </div>
+{{ form_end(form) }}
