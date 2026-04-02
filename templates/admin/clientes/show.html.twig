@@ -1,0 +1,37 @@
+{% extends 'layouts/admin.html.twig' %}
+
+{% block title %}Detalles de Cliente - FitLife{% endblock %}
+
+{% block page_title %}Detalles del Cliente{% endblock %}
+
+{% block content %}
+<div class="details-container" style="max-width: 800px; margin: 0 auto;">
+    <div class="card" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--accent); margin-bottom: 1rem;">Información personal</h3>
+        <div class="detalles-info" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div><strong>ID:</strong> {{ cliente.id }}</div>
+            <div><strong>Nombre completo:</strong> {{ cliente.nombre }} {{ cliente.apellido }}</div>
+            <div><strong>Cédula:</strong> {{ cliente.cedula }}</div>
+            <div><strong>Teléfono:</strong> {{ cliente.telefono ?: 'No registrado' }}</div>
+            <div><strong>Correo:</strong> {{ cliente.correo ?: 'No registrado' }}</div>
+            <div><strong>Fecha de registro:</strong> {{ cliente.fechaRegistro|date('d/m/Y') }}</div>
+            <div><strong>Estado:</strong> {{ cliente.estado ? 'Activo' : 'Inactivo' }}</div>
+        </div>
+    </div>
+
+    <div class="action-buttons" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+        <a href="{{ path('admin_cliente_edit', {id: cliente.id}) }}" class="btn btn-primary">Editar Cliente</a>
+        <a href="{{ path('admin_cliente_index') }}" class="btn btn-secondary">Volver al listado</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.details-container .btn-primary { background-color: var(--accent); border: none; padding: 0.5rem 1rem; border-radius: 8px; color: #000; font-weight: 600; text-decoration: none; display: inline-block; }
+.details-container .btn-primary:hover { background-color: #e59400; color: #000; }
+.details-container .btn-secondary { background-color: #2c2c2c; border: 1px solid #444; color: #e0e0e0; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; display: inline-block; }
+.details-container .btn-secondary:hover { background-color: #3c3c3c; color: #fff; }
+</style>
+{% endblock %}

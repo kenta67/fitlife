@@ -1,40 +1,40 @@
 {% extends 'layouts/admin.html.twig' %}
 
-{% block title %}Gestión de Personal - FitLife{% endblock %}
+{% block title %}Gestión de Clientes - FitLife{% endblock %}
 
-{% block page_title %}Gestión de Personal{% endblock %}
+{% block page_title %}Clientes del Gimnasio{% endblock %}
 
 {% block content %}
 <div class="stats-row">
   <div class="stat-card c1">
     <div class="stat-icon">👥</div>
-    <div class="stat-val">{{ totalPersonal }}</div>
-    <div class="stat-lbl">Total empleados</div>
+    <div class="stat-val">{{ stats.total }}</div>
+    <div class="stat-lbl">Total clientes</div>
   </div>
   <div class="stat-card c2">
-    <div class="stat-icon">👨‍💼</div>
-    <div class="stat-val">{{ countsByRole['administrador'] ?? 0 }}</div>
-    <div class="stat-lbl">Administradores</div>
+    <div class="stat-icon">✅</div>
+    <div class="stat-val">{{ stats.activos }}</div>
+    <div class="stat-lbl">Activos</div>
   </div>
   <div class="stat-card c3">
-    <div class="stat-icon">🧑‍🏫</div>
-    <div class="stat-val">{{ countsByRole['instructor'] ?? 0 }}</div>
-    <div class="stat-lbl">Instructores</div>
+    <div class="stat-icon">⛔</div>
+    <div class="stat-val">{{ stats.inactivos }}</div>
+    <div class="stat-lbl">Inactivos</div>
   </div>
   <div class="stat-card c4">
-    <div class="stat-icon">📞</div>
-    <div class="stat-val">{{ countsByRole['recepcionista'] ?? 0 }}</div>
-    <div class="stat-lbl">Recepcionistas</div>
+    <div class="stat-icon">📅</div>
+    <div class="stat-val">{{ stats.nuevosEsteMes ?? 0 }}</div>
+    <div class="stat-lbl">Nuevos este mes</div>
   </div>
 </div>
 
 <div class="toolbar">
   <div class="search-wrapper">
     <i class="fas fa-search search-icon"></i>
-    <input type="text" id="searchInput" class="form-control search-input" placeholder="Buscar empleado...">
+    <input type="text" id="searchInput" class="form-control search-input" placeholder="Buscar por nombre, cédula o correo...">
   </div>
-  <a href="{{ path('admin_personal_new') }}" class="btn-new">
-    <i class="fas fa-plus"></i> Nuevo Personal
+  <a href="{{ path('admin_cliente_new') }}" class="btn-new">
+    <i class="fas fa-plus"></i> Nuevo Cliente
   </a>
 </div>
 
@@ -43,52 +43,57 @@
     <thead>
       <tr>
         <th>#</th>
-        <th>NOMBRE</th>
-        <th>USUARIO</th>
-        <th>ROL</th>
+        <th>NOMBRE COMPLETO</th>
+        <th>CÉDULA</th>
+        <th>TELÉFONO</th>
+        <th>CORREO</th>
+        <th>FECHA REGISTRO</th>
         <th>ESTADO</th>
         <th>ACCIONES</th>
       </tr>
     </thead>
     <tbody>
-      {% for personal in personales %}
+      {% for cliente in clientes %}
       <tr>
-        <td>{{ personal.id }}</td>
-        <td>{{ personal.nombre }}</td>
-        <td>{{ personal.usuario }}</td>
-        <td>{{ personal.rol.nombre|capitalize }}</td>
+        <td>{{ cliente.id }}</td>
+        <td>{{ cliente.nombre }} {{ cliente.apellido }}</td>
+        <td>{{ cliente.cedula }}</td>
+        <td>{{ cliente.telefono ?: '-' }}</td>
+        <td>{{ cliente.correo ?: '-' }}</td>
+        <td>{{ cliente.fechaRegistro|date('d/m/Y') }}</td>
         <td>
-          {% if personal.estado %}
+          {% if cliente.estado %}
             <span class="status-badge active">Activo</span>
           {% else %}
             <span class="status-badge inactive">Inactivo</span>
           {% endif %}
         </td>
         <td class="actions">
-          <a href="{{ path('admin_personal_edit', {id: personal.id}) }}" class="btn-icon edit">✏️ Editar</a>
-          <form method="post" action="{{ path('admin_personal_delete', {'id': personal.id}) }}" style="display:inline-block" onsubmit="return confirm('¿Eliminar este empleado?');">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ personal.id) }}">
+          <a href="{{ path('admin_cliente_show', {id: cliente.id}) }}" class="btn-icon details">📋 Detalles</a>
+          <a href="{{ path('admin_cliente_edit', {id: cliente.id}) }}" class="btn-icon edit">✏️ Editar</a>
+          <form method="post" action="{{ path('admin_cliente_delete', {'id': cliente.id}) }}" style="display:inline-block" onsubmit="return confirm('¿Eliminar este cliente? Se perderán sus inscripciones y pagos asociados.');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cliente.id) }}">
             <button class="btn-icon delete" type="submit">🗑️ Eliminar</button>
           </form>
         </td>
       </tr>
       {% else %}
       <tr>
-        <td colspan="6" class="text-center">No hay empleados registrados</td>
+        <td colspan="8" class="text-center">No hay clientes registrados</td>
       </tr>
       {% endfor %}
     </tbody>
-  </table>
+   </table>
 </div>
 
 {% if totalPages > 1 %}
 <div class="pagination-container">
   <div class="pagination">
-    <a href="{{ currentPage > 1 ? path('admin_personal_index', {page: currentPage-1}) : '#' }}" class="page-link {{ currentPage == 1 ? 'disabled' : '' }}">← Anterior</a>
+    <a href="{{ currentPage > 1 ? path('admin_cliente_index', {page: currentPage-1}) : '#' }}" class="page-link {{ currentPage == 1 ? 'disabled' : '' }}">← Anterior</a>
     {% for i in 1..totalPages %}
-      <a href="{{ path('admin_personal_index', {page: i}) }}" class="page-link {{ currentPage == i ? 'active' : '' }}">{{ i }}</a>
+      <a href="{{ path('admin_cliente_index', {page: i}) }}" class="page-link {{ currentPage == i ? 'active' : '' }}">{{ i }}</a>
     {% endfor %}
-    <a href="{{ currentPage < totalPages ? path('admin_personal_index', {page: currentPage+1}) : '#' }}" class="page-link {{ currentPage == totalPages ? 'disabled' : '' }}">Siguiente →</a>
+    <a href="{{ currentPage < totalPages ? path('admin_cliente_index', {page: currentPage+1}) : '#' }}" class="page-link {{ currentPage == totalPages ? 'disabled' : '' }}">Siguiente →</a>
   </div>
 </div>
 {% endif %}
@@ -114,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block stylesheets %}
 {{ parent() }}
 <style>
-
 :root { --bg: #1e1e2f; --card: #2a2a3a; --border: #3a3a4a; --text: #f0f0f0; --muted: #aaa; --accent: #ffb347; }
 .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 28px; }
 .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; position: relative; overflow: hidden; transition: transform .2s; }
