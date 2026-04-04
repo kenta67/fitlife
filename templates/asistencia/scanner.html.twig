@@ -1,0 +1,234 @@
+{# templates/asistencia/scanner.html.twig #}
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Marcar asistencia - Escáner QR{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    :root {
+        --bg-dark: #0a0a0f;
+        --card-bg: rgba(20, 20, 30, 0.85);
+        --accent: #ffb347;
+        --text: #f0f0f0;
+        --border: #2a2a35;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2a 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .scanner-container {
+        max-width: 650px;
+        width: 90%;
+        margin: 2rem auto;
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        border-radius: 2rem;
+        padding: 2rem 1.5rem;
+        border: 1px solid var(--border);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        text-align: center;
+    }
+
+    h1 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2.5rem;
+        letter-spacing: 2px;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    #qr-reader {
+        width: 100%;
+        max-width: 500px;
+        margin: 1rem auto;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        border: 2px solid var(--accent);
+    }
+
+    .alert {
+        border-radius: 1rem;
+        padding: 0.75rem;
+        font-weight: 500;
+        animation: fadeInUp 0.3s ease;
+    }
+
+    .alert-success {
+        background: rgba(63, 185, 80, 0.2);
+        border: 1px solid #3fb950;
+        color: #3fb950;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.2);
+        border: 1px solid #dc3545;
+        color: #dc3545;
+    }
+
+    .btn-secondary {
+        background: #2c2c3a;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 2rem;
+        color: var(--text);
+        text-decoration: none;
+        transition: all 0.2s;
+        display: inline-block;
+        margin-top: 1rem;
+    }
+
+    .btn-secondary:hover {
+        background: var(--accent);
+        color: #000;
+        transform: translateY(-2px);
+    }
+
+    .fullscreen-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--accent);
+        border: none;
+        border-radius: 3rem;
+        padding: 0.8rem 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(255, 179, 71, 0.4);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .fullscreen-btn:hover {
+        transform: scale(1.05);
+        background: #e59400;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .scanner-container {
+            width: 95%;
+            padding: 1rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        .fullscreen-btn {
+            bottom: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="scanner-container">
+    <h1>📷 Marcador de Asistencia</h1>
+    <div id="qr-reader"></div>
+    <div id="resultado" class="alert" style="display: none;"></div>
+    <a href="{{ path('admin_dashboard') }}" class="btn-secondary">← Volver al panel</a>
+</div>
+<button id="fullscreenBtn" class="fullscreen-btn">⛶ Pantalla completa</button>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+    const html5QrCode = new Html5Qrcode("qr-reader");
+    const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
+    
+    function onScanSuccess(decodedText, decodedResult) {
+        html5QrCode.stop().then(() => {
+            let token = null;
+            try {
+                const url = new URL(decodedText);
+                token = url.searchParams.get('token');
+            } catch(e) {
+                token = decodedText;
+            }
+            
+            if (!token) {
+                mostrarMensaje('QR inválido: no se encontró token', 'danger');
+                reiniciarScanner();
+                return;
+            }
+            
+            fetch('/asistencia/registrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarMensaje(data.error, 'danger');
+                } else {
+                    mostrarMensaje(data.mensaje, 'success');
+                }
+                reiniciarScanner();
+            })
+            .catch(err => {
+                mostrarMensaje('Error de conexión', 'danger');
+                reiniciarScanner();
+            });
+        }).catch(err => {
+            console.error("Error al detener scanner", err);
+            reiniciarScanner();
+        });
+    }
+    
+    function mostrarMensaje(texto, tipo) {
+        const div = document.getElementById('resultado');
+        div.textContent = texto;
+        div.className = `alert alert-${tipo}`;
+        div.style.display = 'block';
+        setTimeout(() => {
+            div.style.display = 'none';
+        }, 5000);
+    }
+    
+    function reiniciarScanner() {
+        setTimeout(() => {
+            html5QrCode.start({ facingMode: "environment" }, qrConfig, onScanSuccess)
+                .catch(err => mostrarMensaje("Error al reiniciar la cámara", "danger"));
+        }, 2000);
+    }
+    
+    html5QrCode.start({ facingMode: "environment" }, qrConfig, onScanSuccess)
+        .catch(err => mostrarMensaje("Error al acceder a la cámara: " + err, "danger"));
+
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    fullscreenBtn.addEventListener('click', () => {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        }
+    });
+</script>
+{% endblock %}

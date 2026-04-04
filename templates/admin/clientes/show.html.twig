@@ -19,6 +19,15 @@
         </div>
     </div>
 
+    <!-- NUEVO: Bloque para mostrar el código QR de asistencia -->
+    <div class="card" style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--accent); margin-bottom: 1rem;">Código QR para asistencia</h3>
+        <div class="text-center">
+            <img src="data:image/png;base64,{{ qrImageData }}" alt="QR Code" class="img-fluid" style="max-width: 200px;">
+            <p class="mt-2">Escanee este QR para registrar entrada/salida.</p>
+        </div>
+    </div>
+
     <div class="action-buttons" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
         <a href="{{ path('admin_cliente_edit', {id: cliente.id}) }}" class="btn btn-primary">Editar Cliente</a>
         <a href="{{ path('admin_cliente_index') }}" class="btn btn-secondary">Volver al listado</a>

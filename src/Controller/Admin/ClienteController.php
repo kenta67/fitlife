@@ -6,11 +6,20 @@ use App\Entity\Cliente;
 use App\Form\ClienteType;
 use App\Repository\ClienteRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Uid\Uuid;
 
 #[Route('/admin/clientes')]
 #[IsGranted('ROLE_ADMIN')]
@@ -44,15 +53,23 @@ class ClienteController extends AbstractController
     {
         $cliente = new Cliente();
         $cliente->setFechaRegistro(new \DateTimeImmutable());
-
+        
+        // NUEVO: Generar token único para el QR (UUID v4)
+        $token = Uuid::v4()->toRfc4122();
+        $cliente->setQrCodigo($token);
+        
         $form = $this->createForm(ClienteType::class, $cliente);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->em->persist($cliente);
-            $this->em->flush();
-            $this->addFlash('success', 'Cliente creado correctamente.');
-            return $this->redirectToRoute('admin_cliente_index');
+            try {
+                $this->em->persist($cliente);
+                $this->em->flush();
+                $this->addFlash('success', 'Cliente creado correctamente.');
+                return $this->redirectToRoute('admin_cliente_index');
+            } catch (UniqueConstraintViolationException $e) {
+                $form->addError(new FormError('Ya existe un cliente con esa cédula.'));
+            }
         }
 
         return $this->render('admin/clientes/new.html.twig', [
@@ -69,9 +86,13 @@ class ClienteController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->em->flush();
-            $this->addFlash('success', 'Cliente actualizado correctamente.');
-            return $this->redirectToRoute('admin_cliente_index');
+            try {
+                $this->em->flush();
+                $this->addFlash('success', 'Cliente actualizado correctamente.');
+                return $this->redirectToRoute('admin_cliente_index');
+            } catch (UniqueConstraintViolationException $e) {
+                $form->addError(new FormError('Ya existe un cliente con esa cédula.'));
+            }
         }
 
         return $this->render('admin/clientes/edit.html.twig', [
@@ -85,8 +106,29 @@ class ClienteController extends AbstractController
     #[Route('/{id}/show', name: 'admin_cliente_show', methods: ['GET'])]
     public function show(Cliente $cliente): Response
     {
+        if (!$cliente->getQrCodigo()) {
+            $cliente->setQrCodigo(Uuid::v4()->toRfc4122());
+            $this->em->flush();
+        }
+
+        $qrUrl = $this->generateUrl('asistencia_scanner', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $qrData = $qrUrl . '?token=' . rawurlencode($cliente->getQrCodigo());
+
+        $builder = new Builder(writer: new PngWriter());
+        $result = $builder->build(
+            data: $qrData,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+        );
+
+        $qrImageData = base64_encode($result->getString());
+
         return $this->render('admin/clientes/show.html.twig', [
             'cliente' => $cliente,
+            'qrImageData' => $qrImageData,
         ]);
     }
 
@@ -101,5 +143,31 @@ class ClienteController extends AbstractController
             $this->addFlash('error', 'Token inválido.');
         }
         return $this->redirectToRoute('admin_cliente_index');
+    }
+
+    // NUEVO: Ruta que genera y devuelve la imagen QR del cliente
+    #[Route('/{id}/qr-image', name: 'admin_cliente_qr_image')]
+    public function qrImage(Cliente $cliente): Response
+    {
+        if (!$cliente->getQrCodigo()) {
+            $cliente->setQrCodigo(Uuid::v4()->toRfc4122());
+            $this->em->flush();
+        }
+
+        // La URL que se codificará en el QR: apunta al escáner con el token como parámetro
+        $qrUrl = $this->generateUrl('asistencia_scanner', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $qrData = $qrUrl . '?token=' . rawurlencode($cliente->getQrCodigo());
+
+        $builder = new Builder(writer: new PngWriter());
+        $result = $builder->build(
+            data: $qrData,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+        );
+
+        return new Response($result->getString(), 200, ['Content-Type' => $result->getMimeType()]);
     }
 }

@@ -80,4 +80,10 @@ class ClienteRepository extends ServiceEntityRepository
             'nuevosEsteMes' => (int) $nuevosEsteMes,
         ];
     }
+
+    // NUEVO: Buscar cliente por el token del QR
+    public function findOneByQrCodigo(string $qrCodigo): ?Cliente
+    {
+        return $this->findOneBy(['qr_codigo' => $qrCodigo]);
+    }
 }
