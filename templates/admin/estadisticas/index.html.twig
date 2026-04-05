@@ -1,0 +1,380 @@
+{% extends 'layouts/admin.html.twig' %}
+
+{% block title %}Estadísticas - FitLife{% endblock %}
+
+{% block page_title %}📊 Centro de Estadísticas{% endblock %}
+
+{% block content %}
+<!-- KPIs PRINCIPALES -->
+<div class="kpis-grid">
+  <div class="kpi-card kpi-growth">
+    <div class="kpi-header">
+      <span class="kpi-icon">👥</span>
+      <span class="kpi-trend {{ resumen.crecimiento_porcentaje >= 0 ? 'positive' : 'negative' }}">
+        {{ resumen.crecimiento_porcentaje >= 0 ? '↑' : '↓' }} {{ resumen.crecimiento_porcentaje|abs }}%
+      </span>
+    </div>
+    <div class="kpi-value">{{ resumen.clientes_activos }}</div>
+    <div class="kpi-label">Clientes Activos</div>
+    <div class="kpi-sub">{{ resumen.clientes_nuevos_mes }} nuevos este mes</div>
+  </div>
+
+  <div class="kpi-card kpi-money">
+    <div class="kpi-header">
+      <span class="kpi-icon">💰</span>
+      <span class="kpi-trend positive">↑ vs mes anterior</span>
+    </div>
+    <div class="kpi-value">{{ resumen.ingresos_mes|number_format(2, ',', '.') }} <small>Bs</small></div>
+    <div class="kpi-label">Ingresos del Mes</div>
+    <div class="kpi-sub">Mes anterior: {{ ingresos.mes_anterior|number_format(2, ',', '.') }} Bs</div>
+  </div>
+
+  <div class="kpi-card kpi-membership">
+    <div class="kpi-header">
+      <span class="kpi-icon">🏷️</span>
+    </div>
+    <div class="kpi-value">{{ resumen.membresias_vigentes }}</div>
+    <div class="kpi-label">Membresías Vigentes</div>
+    <div class="kpi-sub">Sin vencer</div>
+  </div>
+
+  <div class="kpi-card kpi-team">
+    <div class="kpi-header">
+      <span class="kpi-icon">👨‍💼</span>
+    </div>
+    <div class="kpi-value">{{ resumen.personal_activo }}</div>
+    <div class="kpi-label">Personal Activo</div>
+    <div class="kpi-sub">En todos los roles</div>
+  </div>
+</div>
+
+<!-- GRÁFICAS EN GRID -->
+<div class="charts-grid">
+  <!-- Gráfica de Ingresos -->
+  <div class="chart-box wide">
+    <div class="chart-title">📈 Evolución de Ingresos (30 días)</div>
+    <canvas id="chartIngresos" height="320" style="display:block; width:100%; height:320px; max-height:420px;"></canvas>
+  </div>
+
+  <!-- Gráfica de Métodos de Pago -->
+  <div class="chart-box">
+    <div class="chart-title">💳 Distribución por Método</div>
+    <canvas id="chartMetodos" height="320" style="display:block; width:100%; height:320px; max-height:420px;"></canvas>
+  </div>
+
+  <!-- Gráfica de Personal -->
+  <div class="chart-box">
+    <div class="chart-title">👥 Personal por Rol</div>
+    <canvas id="chartPersonal" height="320" style="display:block; width:100%; height:320px; max-height:420px;"></canvas>
+  </div>
+
+  <!-- Estado de Clientes -->
+  <div class="chart-box">
+    <div class="chart-title">📋 Estado de Clientes</div>
+    <canvas id="chartClientes" height="320" style="display:block; width:100%; height:320px; max-height:420px;"></canvas>
+  </div>
+</div>
+
+<!-- TABLAS DETALLADAS -->
+<div class="detail-sections">
+  <!-- Top Clientes (simulado con datos disponibles) -->
+  <div class="detail-card">
+    <h3 class="detail-title">🏆 Resumen General</h3>
+    <table class="detail-table">
+      <tbody>
+        <tr>
+          <td>Total Clientes Registrados</td>
+          <td class="val">{{ clientes.total }}</td>
+        </tr>
+        <tr>
+          <td>Clientes Activos</td>
+          <td class="val green">{{ clientes.activos }}</td>
+        </tr>
+        <tr>
+          <td>Clientes Inactivos</td>
+          <td class="val red">{{ clientes.inactivos }}</td>
+        </tr>
+        <tr>
+          <td>Nuevos este Mes</td>
+          <td class="val blue">{{ clientes.nuevosEsteMes ?? 0 }}</td>
+        </tr>
+        <tr style="border-top: 1px solid var(--border);">
+          <td>Clases Activas</td>
+          <td class="val">{{ clases.activas }}</td>
+        </tr>
+        <tr>
+          <td>Clases Inactivas</td>
+          <td class="val">{{ clases.inactivas }}</td>
+        </tr>
+        <tr>
+          <td>Total Cupos Disponibles</td>
+          <td class="val">{{ clases.cuposTotales ?? 0 }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Desglose por Rol -->
+  <div class="detail-card">
+    <h3 class="detail-title">👔 Distribución del Personal</h3>
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Cantidad</th>
+          <th>Porcentaje</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set totalPersonal = 0 %}
+        {% for cantidad in personal %}
+        {% set totalPersonal = totalPersonal + cantidad %}
+        {% endfor %}
+        {% if totalPersonal == 0 %}
+        {% set totalPersonal = 1 %}
+        {% endif %}
+        {% for rol, cantidad in personal %}
+        <tr>
+          <td>
+            <span class="rol-badge 
+              {% if rol == 'administrador' %}role-admin
+              {% elseif rol == 'instructor' %}role-inst
+              {% else %}role-recep{% endif %}">
+              {{ rol|capitalize }}
+            </span>
+          </td>
+          <td class="val">{{ cantidad }}</td>
+          <td>
+            <div class="mini-bar">
+              <div class="mini-fill" style="width: {{ (cantidad / totalPersonal * 100)|round }}%"></div>
+            </div>
+            <span class="pct">{{ (cantidad / totalPersonal * 100)|round }}%</span>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" style="text-align:center; color:var(--muted);">Sin datos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Ingresos por Método -->
+  <div class="detail-card">
+    <h3 class="detail-title">💵 Ingresos por Método de Pago</h3>
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Total (Bs)</th>
+          <th>Transacciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in ingresos.por_metodo %}
+        <tr>
+          <td>
+            {% if item.metodo == 'Efectivo' %}💵
+            {% elseif item.metodo == 'Transferencia' %}🏦
+            {% else %}💳{% endif %}
+            {{ item.metodo }}
+          </td>
+          <td class="val green">{{ item.total|number_format(2, ',', '.') }}</td>
+          <td class="val">{{ item.cantidad }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" style="text-align:center; color:var(--muted);">Sin datos este mes</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+:root { --bg: #08080a; --card: #14141a; --border: #22222a; --text: #e8e8e8; --muted: #666; --accent: #f5a623; --green: #3fb950; --blue: #58a6ff; --red: #ff6b6b; }
+
+/* KPIs Grid */
+.kpis-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; position: relative; overflow: hidden; transition: transform .2s; }
+.kpi-card:hover { transform: translateY(-4px); }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.kpi-growth::before { background: linear-gradient(90deg, #3fb950, #58a6ff); }
+.kpi-money::before { background: linear-gradient(90deg, #f5a623, #ff6b6b); }
+.kpi-membership::before { background: linear-gradient(90deg, #bc8cff, #f5a623); }
+.kpi-team::before { background: linear-gradient(90deg, #58a6ff, #bc8cff); }
+
+.kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.kpi-icon { font-size: 28px; }
+.kpi-trend { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.kpi-trend.positive { background: rgba(63,185,80,.15); color: #3fb950; }
+.kpi-trend.negative { background: rgba(255,107,107,.15); color: #ff6b6b; }
+.kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; color: var(--text); margin-bottom: 4px; }
+.kpi-value small { font-size: 18px; color: var(--muted); }
+.kpi-label { font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+.kpi-sub { font-size: 11px; color: var(--muted); opacity: .7; }
+
+/* Charts Grid */
+.charts-grid { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: auto auto; gap: 16px; margin-bottom: 28px; }
+.chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; min-height: 340px; }
+.chart-box canvas { display: block; width: 100% !important; height: 320px !important; max-height: 420px; }
+.chart-box.wide { grid-column: 1 / 2; grid-row: 1 / 3; }
+.chart-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--text); margin-bottom: 20px; }
+
+/* Detail Sections */
+.detail-sections { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.detail-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+.detail-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--accent); margin-bottom: 20px; }
+
+.detail-table { width: 100%; border-collapse: collapse; }
+.detail-table th { text-align: left; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; padding: 10px 8px; border-bottom: 1px solid var(--border); }
+.detail-table td { padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,.03); font-size: 13px; color: var(--text); }
+.detail-table tr:last-child td { border-bottom: none; }
+.detail-table .val { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--accent); text-align: right; }
+.detail-table .val.green { color: #3fb950; }
+.detail-table .val.red { color: #ff6b6b; }
+.detail-table .val.blue { color: #58a6ff; }
+
+/* Badges */
+.rol-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.role-admin { background: rgba(245,166,35,.15); color: #f5a623; }
+.role-inst { background: rgba(63,185,80,.15); color: #3fb950; }
+.role-recep { background: rgba(88,166,255,.15); color: #58a6ff; }
+
+/* Mini bar */
+.mini-bar { display: inline-block; width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; vertical-align: middle; margin-right: 8px; }
+.mini-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .5s ease; }
+.pct { font-size: 12px; color: var(--muted); }
+
+@media (max-width: 1200px) {
+  .kpis-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-grid { grid-template-columns: 1fr; }
+  .chart-box.wide { grid-column: auto; grid-row: auto; }
+  .detail-sections { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Colores globales
+    const textColor = '#888';
+    const gridColor = 'rgba(255,255,255,.05)';
+    const accentColor = '#f5a623';
+    
+    Chart.defaults.color = textColor;
+    Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+    // ── GRÁFICA 1: INGRESOS DIARIOS ──
+    const ctxIngresos = document.getElementById('chartIngresos').getContext('2d');
+    new Chart(ctxIngresos, {
+        type: 'line',
+        data: {
+            labels: {{ grafica_ingresos_diarios|raw }}.map(d => d.fecha),
+            datasets: [{
+                label: 'Ingresos (Bs)',
+                data: {{ grafica_ingresos_diarios|raw }}.map(d => parseFloat(d.total)),
+                borderColor: accentColor,
+                backgroundColor: 'rgba(245,166,35,.1)',
+                borderWidth: 2.5,
+                fill: true,
+                tension: .4,
+                pointBackgroundColor: accentColor,
+                pointBorderColor: '#14141a',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { maxTicksLimit: 10 }, grid: { color: gridColor } },
+                y: { beginAtZero: true, grid: { color: gridColor } }
+            }
+        }
+    });
+
+    // ── GRÁFICA 2: MÉTODOS DE PAGO (DONA) ──
+    const ctxMetodos = document.getElementById('chartMetodos').getContext('2d');
+    const metodosData = {{ grafica_metodos|raw }};
+    new Chart(ctxMetodos, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(metodosData),
+            datasets: [{
+                data: Object.values(metodosData),
+                backgroundColor: ['#3fb950', '#58a6ff', '#bc8cff'],
+                borderColor: '#14141a',
+                borderWidth: 3,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } }
+            },
+            cutout: '65%'
+        }
+    });
+
+    // ── GRÁFICA 3: PERSONAL (POLAR) ──
+    const ctxPersonal = document.getElementById('chartPersonal').getContext('2d');
+    const personalData = {{ personal|json_encode|raw }};
+    new Chart(ctxPersonal, {
+        type: 'polarArea',
+        data: {
+            labels: Object.keys(personalData).map(k => k.charAt(0).toUpperCase() + k.slice(1)),
+            datasets: [{
+                data: Object.values(personalData),
+                backgroundColor: [
+                    'rgba(245,166,35,.6)',
+                    'rgba(63,185,80,.6)', 
+                    'rgba(88,166,255,.6)'
+                ],
+                borderColor: '#14141a',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { r: { ticks: { backdropColor: 'transparent' }, grid: { color: gridColor } } }
+        }
+    });
+
+    // ── GRÁFICA 4: CLIENTES (BARRA) ──
+    const ctxClientes = document.getElementById('chartClientes').getContext('2d');
+    new Chart(ctxClientes, {
+        type: 'bar',
+        data: {
+            labels: ['Activos', 'Inactivos', 'Nuevos Mes'],
+            datasets: [{
+                label: 'Cantidad',
+                data: [{{ clientes.activos }}, {{ clientes.inactivos }}, {{ clientes.nuevosEsteMes ?? 0 }}],
+                backgroundColor: ['#3fb950', '#ff6b6b', '#58a6ff'],
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { color: gridColor } }, y: { grid: { display: false } } }
+        }
+    });
+});
+</script>
+{% endblock %}

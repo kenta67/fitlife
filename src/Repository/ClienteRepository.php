@@ -86,4 +86,23 @@ class ClienteRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['qr_codigo' => $qrCodigo]);
     }
+
+    /**
+     * Cuenta clientes nuevos registrados este mes.
+     */
+    public function countNewThisMonth(): int
+    {
+        $now = new \DateTime();
+        $firstDay = (new \DateTime())->setDate((int)$now->format('Y'), (int)$now->format('m'), 1);
+        
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.fechaRegistro >= :firstDay')
+            ->setParameter('firstDay', $firstDay)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+
+
 }

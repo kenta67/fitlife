@@ -1,0 +1,288 @@
+{% extends 'layouts/admin.html.twig' %}
+
+{% block title %}Reporte de Ingresos - FitLife{% endblock %}
+
+{% block page_title %}💰 Reporte de Ingresos{% endblock %}
+
+{% block content %}
+<!-- TARJETAS DE RESUMEN -->
+<div class="stats-row">
+  <div class="stat-card c1">
+    <div class="stat-icon">💵</div>
+    <div class="stat-val">{{ stats.total_ingresos|number_format(2, ',', '.') }}</div>
+    <div class="stat-lbl">Bs Total (Filtro)</div>
+  </div>
+  <div class="stat-card c2">
+    <div class="stat-icon">🧾</div>
+    <div class="stat-val">{{ stats.cantidad_pagos }}</div>
+    <div class="stat-lbl">Transacciones</div>
+  </div>
+  <div class="stat-card c3">
+    <div class="stat-icon">💳</div>
+    <div class="stat-val">{{ stats.por_metodo|length }}</div>
+    <div class="stat-lbl">Métodos de Pago</div>
+  </div>
+  <div class="stat-card c4">
+    <div class="stat-icon">📊</div>
+    <div class="stat-val">{{ totalRegistros }}</div>
+    <div class="stat-lbl">Registros mostrados</div>
+  </div>
+</div>
+
+<!-- GRÁFICA DE INGRESOS -->
+<div class="chart-container" style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <h3 style="color: var(--accent); font-size: 16px; margin-bottom: 16px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;">
+    📈 TENDENCIA DE INGRESOS (Últimos 30 días)
+  </h3>
+  <canvas id="graficaIngresos" height="320" style="display:block; width:100%; height:320px; max-height:420px;"></canvas>
+</div>
+
+<!-- FILTROS AVANZADOS -->
+<div class="filters-panel" style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <form method="get" action="{{ path('admin_ingresos_index') }}" class="filters-form" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
+    
+    <div class="filter-group" style="flex: 1; min-width: 180px;">
+      <label style="display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">📅 Desde</label>
+      <input type="date" name="fecha_desde" value="{{ filtros.fecha_desde }}" 
+             style="width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text);">
+    </div>
+
+    <div class="filter-group" style="flex: 1; min-width: 180px;">
+      <label style="display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">📅 Hasta</label>
+      <input type="date" name="fecha_hasta" value="{{ filtros.fecha_hasta }}" 
+             style="width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text);">
+    </div>
+
+    <div class="filter-group" style="flex: 1; min-width: 180px;">
+      <label style="display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">🔍 Buscar ID</label>
+      <input type="number" name="busqueda" value="{{ filtros.busqueda }}" placeholder="ID Pago/Cliente/Membresía"
+             style="width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text);">
+    </div>
+
+    <button type="submit" class="btn-filter" style="background: var(--accent); color: #000; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+      🔍 Filtrar
+    </button>
+
+    <a href="{{ path('admin_ingresos_index') }}" class="btn-clear" style="background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 13px;">
+      ✖ Limpiar
+    </a>
+
+    <!-- BOTÓN EXPORTAR -->
+    <a href="{{ path('admin_ingresos_exportar', filtros) }}" 
+       class="btn-export" 
+       style="background: linear-gradient(135deg, #3fb950, #238636); color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;"
+       onclick="return confirm('¿Exportar reporte con los filtros actuales?');">
+      📥 Exportar CSV
+    </a>
+  </form>
+</div>
+
+<!-- RESUMEN POR MÉTODO DE PAGO -->
+{% if stats.por_metodo|length > 0 %}
+<div class="metodos-resumen" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px;">
+  {% for metodo in stats.por_metodo %}
+  <div class="metodo-chip" style="background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center;">
+    <div style="font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">{{ metodo.metodo }}</div>
+    <div style="font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--accent); margin-top: 4px;">
+      {{ metodo.total|number_format(2, ',', '.') }} Bs
+    </div>
+    <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">{{ metodo.cantidad }} transacciones</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- TABLA DE PAGOS -->
+<div class="table-container">
+  <table class="personal-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>FECHA</th>
+        <th>CLIENTE</th>
+        <th>PLAN</th>
+        <th>MONTO (Bs)</th>
+        <th>MÉTODO</th>
+        <th>REGISTRÓ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pago in pagos %}
+      <tr>
+        <td><span style="background: rgba(245,166,35,.15); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">#{{ pago.id }}</span></td>
+        <td>{{ pago.fechaPago|date('d/m/Y') }}</td>
+        <td>
+          <strong>{{ pago.membresiaCliente.cliente.nombre }} {{ pago.membresiaCliente.cliente.apellido }}</strong>
+          <br><span style="font-size: 11px; color: var(--muted);">CI: {{ pago.membresiaCliente.cliente.cedula }}</span>
+        </td>
+        <td><span style="background: rgba(88,166,255,.1); color: #58a6ff; padding: 3px 10px; border-radius: 12px; font-size: 12px;">{{ pago.membresiaCliente.plan.nombrePlan }}</span></td>
+        <td style="font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #3fb950;">{{ pago.monto|number_format(2, ',', '.') }}</td>
+        <td>
+          {% if pago.metodoPago == 'Efectivo' %}
+            <span class="badge-method efectivo">💵 Efectivo</span>
+          {% elseif pago.metodoPago == 'Transferencia' %}
+            <span class="badge-method transferencia">🏦 Transferencia</span>
+          {% else %}
+            <span class="badge-method tarjeta">💳 Tarjeta</span>
+          {% endif %}
+        </td>
+        <td>{{ pago.personal.nombre }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 40px; color: var(--muted);">
+          <div style="font-size: 40px; margin-bottom: 12px;">📭</div>
+          No se encontraron pagos con estos filtros
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- PAGINACIÓN -->
+{% if totalPages > 1 %}
+<div class="pagination-container">
+  <div class="pagination">
+    <a href="{{ currentPage > 1 ? path('admin_ingresos_index', filtros|merge({page: currentPage-1})) : '#' }}" 
+       class="page-link {{ currentPage == 1 ? 'disabled' : '' }}">← Anterior</a>
+    
+    {% set startPage = max(1, currentPage - 2) %}
+    {% set endPage = min(totalPages, currentPage + 2) %}
+    
+    {% if startPage > 1 %}
+      <a href="{{ path('admin_ingresos_index', filtros|merge({page: 1})) }}" class="page-link">1</a>
+      {% if startPage > 2 %}<span style="color: var(--muted); padding: 6px 8px;">...</span>{% endif %}
+    {% endif %}
+    
+    {% for i in startPage..endPage %}
+      <a href="{{ path('admin_ingresos_index', filtros|merge({page: i})) }}" 
+         class="page-link {{ currentPage == i ? 'active' : '' }}">{{ i }}</a>
+    {% endfor %}
+    
+    {% if endPage < totalPages %}
+      {% if endPage < totalPages - 1 %}<span style="color: var(--muted); padding: 6px 8px;">...</span>{% endif %}
+      <a href="{{ path('admin_ingresos_index', filtros|merge({page: totalPages})) }}" class="page-link">{{ totalPages }}</a>
+    {% endif %}
+    
+    <a href="{{ currentPage < totalPages ? path('admin_ingresos_index', filtros|merge({page: currentPage+1})) : '#' }}" 
+       class="page-link {{ currentPage == totalPages ? 'disabled' : '' }}">Siguiente →</a>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+:root { --bg: #1e1e2f; --card: #2a2a3a; --border: #3a3a4a; --text: #f0f0f0; --muted: #aaa; --accent: #ffb347; }
+
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 28px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; position: relative; overflow: hidden; transition: transform .2s; }
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.stat-card.c1::before { background: var(--accent); }
+.stat-card.c2::before { background: #58a6ff; }
+.stat-card.c3::before { background: #3fb950; }
+.stat-card.c4::before { background: #bc8cff; }
+.stat-icon { font-size: 24px; margin-bottom: 10px; }
+.stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 38px; line-height: 1; margin-bottom: 4px; }
+.stat-card.c1 .stat-val { color: var(--accent); }
+.stat-card.c2 .stat-val { color: #58a6ff; }
+.stat-card.c3 .stat-val { color: #3fb950; }
+.stat-card.c4 .stat-val { color: #bc8cff; }
+.stat-lbl { font-size: 12px; color: var(--muted); }
+
+.table-container { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; margin-bottom: 24px; }
+.personal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.personal-table th { text-align: left; padding: 14px 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); background: rgba(0,0,0,.2); }
+.personal-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+.personal-table tr:hover { background: rgba(255,255,255,.02); }
+
+.badge-method { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-method.efectivo { background: rgba(63,185,80,.15); color: #3fb950; }
+.badge-method.transferencia { background: rgba(88,166,255,.15); color: #58a6ff; }
+.badge-method.tarjeta { background: rgba(188,140,255,.15); color: #bc8cff; }
+
+.btn-filter:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245,166,35,.3); }
+.btn-export:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(63,185,80,.3); }
+.btn-clear:hover { border-color: var(--accent); color: var(--accent); }
+
+.pagination-container { display: flex; justify-content: center; margin-top: 24px; }
+.pagination { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.page-link { background: var(--card); border: 1px solid var(--border); padding: 8px 14px; border-radius: 6px; color: var(--text); text-decoration: none; transition: all 0.2s; font-size: 13px; }
+.page-link.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+.page-link.disabled { opacity: 0.4; pointer-events: none; }
+.page-link:hover:not(.disabled):not(.active) { border-color: var(--accent); color: var(--accent); }
+
+.chart-container { position: relative; min-height: 340px; }
+#graficaIngresos { display: block; width: 100%; height: 320px !important; max-height: 420px; }
+
+  filter: invert(1);
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .filters-form { flex-direction: column; }
+  .filter-group { min-width: 100% !important; }
+}
+</style>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const datosGrafica = {{ datosGrafica|raw }};
+    
+    const ctx = document.getElementById('graficaIngresos').getContext('2d');
+    
+    if (window.chartIngresos) {
+        window.chartIngresos.destroy();
+    }
+    
+    window.chartIngresos = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: datosGrafica.map(d => d.fecha),
+            datasets: [{
+                label: 'Ingresos Diarios (Bs)',
+                data: datosGrafica.map(d => parseFloat(d.total)),
+                borderColor: '#ffb347',
+                backgroundColor: 'rgba(255,179,71,.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: .4,
+                pointBackgroundColor: '#ffb347',
+                pointBorderColor: '#000',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#aaa', font: { family: "'DM Sans', sans-serif" } }
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { color: '#666' },
+                    grid: { color: 'rgba(255,255,255,.05)' }
+                },
+                y: { 
+                    beginAtZero: true,
+                    ticks: { color: '#666' },
+                    grid: { color: 'rgba(255,255,255,.05)' }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

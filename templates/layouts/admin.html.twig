@@ -111,8 +111,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
     
 
     <div class="nav-section">Reportes</div>
-    <a href="#" class="nav-item"><span class="nav-icon">💰</span> Ingresos</a>
-    <a href="#" class="nav-item"><span class="nav-icon">📈</span> Estadísticas</a>
+    <a href="{{ path('admin_ingresos_index') }}" class="nav-item {% if app.request.get('_route') starts with 'admin_ingresos' %}active{% endif %}">
+      <span class="nav-icon">💰</span> Ingresos
+    </a>
+    <a href="{{ path('admin_estadisticas_index') }}" class="nav-item {% if app.request.get('_route') starts with 'admin_estadisticas' %}active{% endif %}">
+      <span class="nav-icon">📈</span> Estadísticas
+    </a>
   </nav>
   <div class="sidebar-user">
     <div class="user-avatar">{{ app.user.nombre|first|upper }}</div>
@@ -120,6 +124,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
       <div class="name">{{ app.user.nombre }}</div>
       <div class="rol">Administrador</div>
     </div>
+
+
+
+    
     <div style="display: flex; gap: 8px;">
       <a href="{{ path('asistencia_scanner') }}" target="_blank" class="btn-logout" title="Abrir panel de asistencia">📷</a>
       <a href="{{ path('app_logout') }}" class="btn-logout" title="Cerrar sesión">⎋</a>
