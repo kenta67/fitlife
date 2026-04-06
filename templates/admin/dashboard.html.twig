@@ -28,39 +28,8 @@
   </div>
 </div>
 
-<div class="modules-title">Módulos del Sistema</div>
-<div class="modules-grid">
-  <a href="{{ path('admin_personal_index') }}" class="mod-card">
-    <div class="mod-icon">👥</div>
-    <div class="mod-name">Gestión de Personal</div>
-    <div class="mod-desc">Agregar, editar y desactivar empleados del gimnasio</div>
-  </a>
-  <a href="{{ path('admin_planes_index') }}" class="mod-card">
-    <div class="mod-icon">🏷️</div>
-    <div class="mod-name">Planes de Membresía</div>
-    <div class="mod-desc">Configurar precios, duraciones y disponibilidad</div>
-  </a>
-  <a href="{{ path('admin_clase_index') }}" class="mod-card">
-    <div class="mod-icon">🏋️</div>
-    <div class="mod-name">Clases y Horarios</div>
-    <div class="mod-desc">Administrar clases, instructores y capacidades</div>
-  </a>
-  <a href="#" class="mod-card">
-    <div class="mod-icon">💰</div>
-    <div class="mod-name">Reportes de Pagos</div>
-    <div class="mod-desc">Ver historial de cobros y métodos de pago</div>
-  </a>
-  <a href="#" class="mod-card">
-    <div class="mod-icon">📈</div>
-    <div class="mod-name">Estadísticas</div>
-    <div class="mod-desc">Gráficas de asistencia, retención y crecimiento</div>
-  </a>
-  <a href="#" class="mod-card">
-    <div class="mod-icon">⚙️</div>
-    <div class="mod-name">Configuración</div>
-    <div class="mod-desc">Ajustes generales del sistema FitLife</div>
-  </a>
-</div>
+<div class="modules-title">RESUMEN DE CLIENTES Y SUS MEMBRESIAS</div>
+
 {% endblock %}
 
 {% block stylesheets %}
@@ -85,17 +54,12 @@
 .stat-card.c3 .stat-val{color:#3fb950}
 .stat-card.c4 .stat-val{color:#bc8cff}
 .stat-lbl{font-size:12px;color:var(--muted)}
-.modules-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:14px;color:var(--text)}
-.modules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.mod-card{
-  background:var(--card);border:1px solid var(--border);border-radius:10px;
-  padding:20px;text-decoration:none;color:var(--text);
-  transition:border-color .2s,transform .2s;
-  display:flex;flex-direction:column;gap:8px;
+.modules-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  color: var(--text);
 }
-.mod-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-.mod-icon{font-size:28px}
-.mod-name{font-weight:600;font-size:14px}
-.mod-desc{font-size:12px;color:var(--muted);line-height:1.5}
 </style>
 {% endblock %}
