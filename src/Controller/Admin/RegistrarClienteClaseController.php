@@ -19,7 +19,7 @@ class RegistrarClienteClaseController extends AbstractController
     #[Route('/admin/registrar-cliente-clase', name: 'admin_registrar_cliente_clase')]
     public function registrar(
         Request $request,
-        EntityManagerInterface $em,Hey, Cortana. Hey, Cortana. Hey, Cortana. Form A. Yeah, comedy is super weakness safe. 
+        EntityManagerInterface $em,
         ClaseRepository $claseRepo,
         ClienteRepository $clienteRepo,
         MembresiaClienteRepository $membresiaClienteRepo
