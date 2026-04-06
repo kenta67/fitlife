@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\InscripcionClaseRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: InscripcionClaseRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: 'inscripcion_clase')]
 class InscripcionClase
 {
@@ -28,13 +28,44 @@ class InscripcionClase
     #[ORM\Column(type: 'boolean')]
     private bool $estado = true;
 
-    public function getId(): ?int { return $this->id; }
-    public function getCliente(): Cliente { return $this->cliente; }
-    public function setCliente(Cliente $c): static { $this->cliente = $c; return $this; }
-    public function getClase(): Clase { return $this->clase; }
-    public function setClase(Clase $c): static { $this->clase = $c; return $this; }
-    public function getFecha(): \DateTimeInterface { return $this->fecha; }
-    public function setFecha(\DateTimeInterface $f): static { $this->fecha = $f; return $this; }
-    public function isEstado(): bool { return $this->estado; }
-    public function setEstado(bool $e): static { $this->estado = $e; return $this; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+    public function getCliente(): Cliente
+    {
+        return $this->cliente;
+    }
+    public function setCliente(Cliente $c): static
+    {
+        $this->cliente = $c;
+        return $this;
+    }
+    public function getClase(): Clase
+    {
+        return $this->clase;
+    }
+    public function setClase(Clase $c): static
+    {
+        $this->clase = $c;
+        return $this;
+    }
+    public function getFecha(): \DateTimeInterface
+    {
+        return $this->fecha;
+    }
+    public function setFecha(\DateTimeInterface $f): static
+    {
+        $this->fecha = $f;
+        return $this;
+    }
+    public function isEstado(): bool
+    {
+        return $this->estado;
+    }
+    public function setEstado(bool $e): static
+    {
+        $this->estado = $e;
+        return $this;
+    }
 }

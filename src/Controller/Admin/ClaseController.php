@@ -91,9 +91,11 @@ class ClaseController extends AbstractController
     public function show(Clase $clase, ClaseRepository $repo): Response
     {
         $clientes = $repo->findClientesInscritos($clase->getId());
+        $clientesActivos = $this->em->getRepository('App\\Entity\\Cliente')->findBy(['estado' => true]);
         return $this->render('admin/clases/show.html.twig', [
             'clase' => $clase,
             'clientes' => $clientes,
+            'clientesActivos' => $clientesActivos,
         ]);
     }
 

@@ -1,0 +1,54 @@
+{% extends 'layouts/admin.html.twig' %}
+
+{% block title %}Registrar Cliente en Clase - FitLife{% endblock %}
+
+
+{% block page_title %}Registrar Cliente Clase{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 600px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem;">
+    {% if mensaje %}
+        <div class="alert alert-{{ mensaje.type }}" style="margin-bottom: 1rem; color: {{ mensaje.type == 'success' ? '#155724' : '#721c24' }}; background: {{ mensaje.type == 'success' ? '#d4edda' : '#f8d7da' }}; border: 1px solid {{ mensaje.type == 'success' ? '#c3e6cb' : '#f5c6cb' }}; border-radius: 8px; padding: 0.75rem 1rem;">
+            {{ mensaje.text }}
+        </div>
+    {% endif %}
+    <form method="post">
+        <div class="form-group">
+            <label for="clienteId">Cliente</label>
+            <select name="clienteId" id="clienteId" class="form-control" required style="background: #18181c; color: #fff; border: 1px solid var(--border); border-radius: 8px;">
+                <option value="">Selecciona un cliente...</option>
+                {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }} ({{ cliente.cedula }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="claseId">Clase</label>
+            <select name="claseId" id="claseId" class="form-control" required style="background: #18181c; color: #fff; border: 1px solid var(--border); border-radius: 8px;">
+                <option value="">Selecciona una clase...</option>
+                {% for clase in clases %}
+                    <option value="{{ clase.id }}">{{ clase.nombre }} ({{ clase.horario }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-buttons" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+            <a href="{{ path('admin_cliente_index') }}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Inscribir</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.form-container .form-group { margin-bottom: 1rem; }
+.form-container label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 500; color: var(--muted); }
+.form-container select { width: 100%; padding: 0.5rem 0.75rem; background-color: #18181c; border: 1px solid var(--border); border-radius: 8px; color: #fff; transition: border-color 0.2s; }
+.form-container select:focus { border-color: var(--accent); outline: none; }
+.btn-primary { background-color: var(--accent); border: none; padding: 0.5rem 1rem; border-radius: 8px; color: #000; font-weight: 600; text-decoration: none; display: inline-block; }
+.btn-primary:hover { background-color: #e59400; color: #000; }
+.btn-secondary { background-color: #2c2c2c; border: 1px solid #444; color: #e0e0e0; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; display: inline-block; }
+.btn-secondary:hover { background-color: #3c3c3c; color: #fff; }
+</style>
+{% endblock %}

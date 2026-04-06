@@ -46,6 +46,7 @@
         <th>NOMBRE</th>
         <th>COSTO (Bs)</th>
         <th>DURACIÓN (días)</th>
+        <th>CLASES</th>
         <th>ESTADO</th>
         <th>ACCIONES</th>
       </tr>
@@ -57,6 +58,13 @@
         <td>{{ plan.nombrePlan }}</td>
         <td>{{ plan.costo|number_format(2, ',', '.') }}</td>
         <td>{{ plan.duracionDias }}</td>
+        <td>
+          {% if plan.incluyeClases %}
+            <span class="status-badge active">Incluye</span>
+          {% else %}
+            <span class="status-badge inactive">No incluye</span>
+          {% endif %}
+        </td>
         <td>
           {% if plan.estado %}
             <span class="status-badge active">Activo</span>

@@ -26,6 +26,10 @@ class MembresiaPlanType extends AbstractType
                 'label' => 'Duración (días)',
                 'attr' => ['min' => 1],
             ])
+            ->add('incluyeClases', CheckboxType::class, [
+                'label' => 'Incluye acceso a clases',
+                'required' => false,
+            ])
             ->add('estado', CheckboxType::class, [
                 'label' => 'Activo',
                 'required' => false,

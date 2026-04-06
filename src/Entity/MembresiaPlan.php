@@ -26,17 +26,61 @@ class MembresiaPlan
     #[ORM\Column(type: 'boolean')]
     private bool $estado = true;
 
-    public function getId(): ?int { return $this->id; }
+    #[ORM\Column(type: 'boolean')]
+    private bool $incluyeClases = false;
 
-    public function getNombrePlan(): string { return $this->nombrePlan; }
-    public function setNombrePlan(string $n): static { $this->nombrePlan = $n; return $this; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getCosto(): string { return $this->costo; }
-    public function setCosto(string $costo): static { $this->costo = $costo; return $this; }
+    public function getNombrePlan(): string
+    {
+        return $this->nombrePlan;
+    }
+    public function setNombrePlan(string $n): static
+    {
+        $this->nombrePlan = $n;
+        return $this;
+    }
 
-    public function getDuracionDias(): int { return $this->duracionDias; }
-    public function setDuracionDias(int $d): static { $this->duracionDias = $d; return $this; }
+    public function getCosto(): string
+    {
+        return $this->costo;
+    }
+    public function setCosto(string $costo): static
+    {
+        $this->costo = $costo;
+        return $this;
+    }
 
-    public function isEstado(): bool { return $this->estado; }
-    public function setEstado(bool $e): static { $this->estado = $e; return $this; }
+    public function getDuracionDias(): int
+    {
+        return $this->duracionDias;
+    }
+    public function setDuracionDias(int $d): static
+    {
+        $this->duracionDias = $d;
+        return $this;
+    }
+
+    public function isEstado(): bool
+    {
+        return $this->estado;
+    }
+    public function setEstado(bool $e): static
+    {
+        $this->estado = $e;
+        return $this;
+    }
+
+    public function isIncluyeClases(): bool
+    {
+        return $this->incluyeClases;
+    }
+    public function setIncluyeClases(bool $i): static
+    {
+        $this->incluyeClases = $i;
+        return $this;
+    }
 }

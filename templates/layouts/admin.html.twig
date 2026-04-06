@@ -87,8 +87,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;dis
 
 
     <!-- Dentro de <nav class="sidebar-nav">, en la sección Gestión, después de Personal -->
+
     <a href="{{ path('admin_cliente_index') }}" class="nav-item {% if app.request.get('_route') starts with 'admin_cliente' %}active{% endif %}">
-      <span class="nav-icon">👤</span> Clientes
+      <span class="nav-icon">👤</span> Clientes y Menbresías
     </a>
 
 
