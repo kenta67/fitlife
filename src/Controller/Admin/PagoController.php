@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class PagoController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $em) {}
+
 
     #[Route('/', name: 'admin_pagos_index', methods: ['GET'])]
     public function index(PagoRepository $repo, Request $request): Response
@@ -60,7 +60,7 @@ class PagoController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'admin_pagos_new', methods: ['POST'])]
+    #[Route('/new', name: 'admin_pagos_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $pago = new Pago();
@@ -71,10 +71,15 @@ class PagoController extends AbstractController
             $this->em->persist($pago);
             $this->em->flush();
             $this->addFlash('success', 'Pago registrado correctamente.');
-        } else {
-            $this->addFlash('error', 'Error al registrar el pago. Verifique los datos.');
+            return $this->redirectToRoute('admin_pagos_index');
         }
 
-        return $this->redirectToRoute('admin_pagos_index');
+        return $this->render('admin/pagos/new.html.twig', [
+            'form' => $form->createView(),
+            'title' => 'Registrar Pago',
+            'action' => 'Registrar',
+        ]);
     }
+
+    public function __construct(private EntityManagerInterface $em) {}
 }
