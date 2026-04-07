@@ -30,12 +30,41 @@
 
 <div class="modules-title">RESUMEN DE CLIENTES Y SUS MEMBRESIAS</div>
 
+<table class="resumen-clientes-table resumen-clientes-table-wrapper">
+  <thead>
+    <tr>
+      <th>Cliente</th>
+      <th>Carnet</th>
+      <th>Fecha Inicio</th>
+      <th>Fecha Fin</th>
+      <th>Membresía</th>
+      <th>Clase Inscrita</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for resumen in resumen_clientes %}
+      <tr>
+        <td>{{ resumen.cliente }}</td>
+        <td>{{ resumen.carnet }}</td>
+        <td>{{ resumen.fecha_inicio }}</td>
+        <td>{{ resumen.fecha_fin }}</td>
+        <td>{{ resumen.membresia }}</td>
+        <td>{{ resumen.clase }}</td>
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="6" style="text-align:center;color:var(--muted)">No hay datos para mostrar.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+
 {% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
 <style>
-/* Additional styles for admin dashboard */
+/* --- Dashboard cards --- */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
 .stat-card{
   background:var(--card);border:1px solid var(--border);border-radius:10px;
@@ -60,6 +89,59 @@
   letter-spacing: 1px;
   margin-bottom: 14px;
   color: var(--text);
+}
+
+/* --- Tabla resumen clientes estilo moderno --- */
+.resumen-clientes-table-wrapper {
+  background: #181c23;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px #0002;
+  padding: 0;
+  margin-bottom: 32px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 16px;
+  overflow: hidden;
+}
+.resumen-clientes-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+  font-size: 16px;
+}
+.resumen-clientes-table thead tr {
+  background: #232837;
+}
+.resumen-clientes-table th {
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 8px;
+  border-bottom: 2px solid #31374a;
+  text-align: left;
+}
+.resumen-clientes-table tbody tr {
+  background: #15171d;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.resumen-clientes-table tbody tr:hover {
+  background: #282d3c;
+}
+.resumen-clientes-table td {
+  color: #e6e6e6;
+  padding: 10px 8px;
+  border-bottom: 1px solid #232837;
+}
+.resumen-clientes-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.resumen-clientes-table td, .resumen-clientes-table th {
+  vertical-align: middle;
+}
+.resumen-clientes-table th, .resumen-clientes-table td {
+  white-space: nowrap;
 }
 </style>
 {% endblock %}

@@ -25,6 +25,17 @@ class PagoType extends AbstractType
                     return $mc->getCliente()->getNombre() . ' ' . $mc->getCliente()->getApellido() . ' - ' . $mc->getPlan()->getNombrePlan();
                 },
                 'label' => 'Membresía del Cliente',
+                'query_builder' => function (\App\Repository\MembresiaClienteRepository $repo) {
+                    $qb = $repo->createQueryBuilder('mc')
+                        ->where('mc.estado = :estado')
+                        ->andWhere('mc.fechaVencimiento >= :hoy')
+                        ->setParameter('estado', true)
+                        ->setParameter('hoy', (new \DateTime())->format('Y-m-d'));
+                    // Excluir membresías que ya tienen pago registrado
+                    $qb->leftJoin('App\\Entity\\Pago', 'p', 'WITH', 'p.membresiaCliente = mc.id')
+                        ->andWhere('p.id IS NULL');
+                    return $qb;
+                },
             ])
             // Selección del personal que registra el pago
             ->add('personal', EntityType::class, [
