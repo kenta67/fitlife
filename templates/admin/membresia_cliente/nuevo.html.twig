@@ -36,6 +36,49 @@
 </div>
 {% endblock %}
 
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Obtener duraciones de los planes desde los options
+document.addEventListener('DOMContentLoaded', function() {
+    // Encuentra los selects y campos
+    const planSelect = document.querySelector('select[name$="[plan]"]');
+    const fechaInicioInput = document.querySelector('input[name$="[fechaInicio]"]');
+    const fechaVencimientoInput = document.querySelector('input[name$="[fechaVencimiento]"]');
+
+    // Construir un mapa de id de plan a duración usando los data attributes
+    let planDuraciones = {};
+    for (const option of planSelect.options) {
+        // Symfony muestra el id como value, pero necesitamos la duración
+        // Para esto, agregamos un data-duracion en el controlador/formType
+        if (option.dataset.duracion) {
+            planDuraciones[option.value] = parseInt(option.dataset.duracion);
+        }
+    }
+
+    function calcularFechaFin() {
+        const planId = planSelect.value;
+        const duracion = planDuraciones[planId];
+        const fechaInicio = fechaInicioInput.value;
+        if (duracion && fechaInicio) {
+            const fecha = new Date(fechaInicio);
+            fecha.setDate(fecha.getDate() + duracion);
+            // Formatear yyyy-mm-dd
+            const yyyy = fecha.getFullYear();
+            const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+            const dd = String(fecha.getDate()).padStart(2, '0');
+            fechaVencimientoInput.value = `${yyyy}-${mm}-${dd}`;
+        } else {
+            fechaVencimientoInput.value = '';
+        }
+    }
+
+    planSelect.addEventListener('change', calcularFechaFin);
+    fechaInicioInput.addEventListener('change', calcularFechaFin);
+});
+</script>
+{% endblock %}
+
 {% block stylesheets %}
 {{ parent() }}
 <style>

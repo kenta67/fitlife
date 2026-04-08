@@ -27,6 +27,9 @@ class MembresiaClienteType extends AbstractType
                 'class' => MembresiaPlan::class,
                 'choice_label' => 'nombrePlan',
                 'label' => 'Plan',
+                'choice_attr' => function ($plan) {
+                    return ['data-duracion' => $plan->getDuracionDias()];
+                },
             ])
             ->add('fechaInicio', DateType::class, [
                 'widget' => 'single_text',

@@ -19,7 +19,7 @@
         </div>
         <div class="form-group">
             {{ form_label(form.monto) }}
-            {{ form_widget(form.monto, {attr: {class: 'form-control'}}) }}
+            {{ form_widget(form.monto, {attr: {class: 'form-control', 'readonly': 'readonly'}}) }}
             {{ form_errors(form.monto) }}
         </div>
         <div class="form-group">
@@ -38,6 +38,24 @@
         </div>
     {{ form_end(form) }}
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const membresiaSelect = document.querySelector('select[name$="[membresiaCliente]"]');
+    const montoInput = document.querySelector('input[name$="[monto]"]');
+    if (!membresiaSelect || !montoInput) return;
+    function setMonto() {
+        const selected = membresiaSelect.options[membresiaSelect.selectedIndex];
+        const costo = selected.dataset.costo;
+        montoInput.value = costo ? costo : '';
+    }
+    membresiaSelect.addEventListener('change', setMonto);
+    setMonto(); // Inicializar al cargar
+});
+</script>
 {% endblock %}
 
 {% block stylesheets %}

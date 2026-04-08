@@ -25,6 +25,9 @@ class PagoType extends AbstractType
                     return $mc->getCliente()->getNombre() . ' ' . $mc->getCliente()->getApellido() . ' - ' . $mc->getPlan()->getNombrePlan();
                 },
                 'label' => 'Membresía del Cliente',
+                'choice_attr' => function ($mc) {
+                    return ['data-costo' => $mc->getPlan()->getCosto()];
+                },
                 'query_builder' => function (\App\Repository\MembresiaClienteRepository $repo) {
                     $qb = $repo->createQueryBuilder('mc')
                         ->where('mc.estado = :estado')
@@ -51,6 +54,7 @@ class PagoType extends AbstractType
             ->add('fechaPago', DateType::class, [
                 'label' => 'Fecha de Pago',
                 'widget' => 'single_text',
+                'data' => new \DateTime(),
             ])
             ->add('metodoPago', ChoiceType::class, [
                 'label' => 'Método de Pago',
