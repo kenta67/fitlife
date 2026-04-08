@@ -2,6 +2,8 @@
 
 namespace App\Security;
 
+// Archivo legado: el login activo ahora usa "form_login" en security.yaml.
+
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
