@@ -1,0 +1,251 @@
+{# templates/home/ubicacion.html.twig — Ubicación y contacto (solo informativa) #}
+{% extends 'layouts/public.html.twig' %}
+
+{% block title %}Ubicacion — FitLife Gym{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.ubicacion-hero {
+  background: linear-gradient(135deg, #0a0a0a 0%, #111108 50%, #0a0a0a 100%);
+}
+
+/* ── CONTACTO CARDS ── */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+}
+.contact-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.contact-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255,234,0,.25);
+  box-shadow: 0 14px 32px rgba(0,0,0,.3);
+}
+.contact-card .icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,234,0,.1);
+  border: 1px solid rgba(255,234,0,.2);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 20px;
+}
+.contact-card h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.contact-card p, .contact-card a {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+  text-decoration: none;
+  display: block;
+}
+.contact-card a:hover { color: var(--accent); }
+
+/* ── HORARIOS ── */
+.horarios-table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 48px;
+}
+.horarios-table h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  padding: 24px 28px 0;
+  letter-spacing: 1px;
+}
+.horarios-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+.horarios-table th {
+  text-align: left;
+  padding: 14px 28px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border);
+}
+.horarios-table td {
+  padding: 14px 28px;
+  font-size: 15px;
+  border-bottom: 1px solid var(--border);
+}
+.horarios-table tr:last-child td { border-bottom: none; }
+.horarios-table .hora { color: var(--accent); font-weight: 600; }
+
+/* ── MAPA VISUAL ── */
+.mapa-section { margin-top: 60px; }
+.mapa-wrap {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  height: 420px;
+  background: #1a1a1a;
+}
+.mapa-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  filter: grayscale(0.6) contrast(1.1) brightness(0.7);
+  pointer-events: none;
+}
+.mapa-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(10,10,10,0.5) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 32px;
+  pointer-events: none;
+}
+.mapa-overlay .pin {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(12px);
+  padding: 14px 22px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 600;
+}
+.mapa-overlay .pin::before {
+  content: '📍';
+  font-size: 20px;
+}
+
+/* ── CTA ── */
+.ubicacion-cta {
+  text-align: center;
+  margin-top: 60px;
+  padding: 60px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+}
+.ubicacion-cta h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 4vw, 52px);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.ubicacion-cta h2 span { color: var(--accent); }
+.ubicacion-cta p { color: var(--muted); font-size: 17px; margin-bottom: 28px; }
+
+@media (max-width: 600px) {
+  .mapa-wrap { height: 300px; }
+  .horarios-table th, .horarios-table td { padding: 12px 16px; font-size: 13px; }
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+{# ── HERO ── #}
+<div class="page-hero ubicacion-hero">
+  <div class="container">
+    <span class="page-tag">Contacto</span>
+    <h1 data-aos="fade-up">Encuentranos</h1>
+    <p data-aos="fade-up" data-aos-delay="100">Visitanos en nuestro gimnasio o contactanos por los canales que prefieras.</p>
+  </div>
+</div>
+
+{# ── INFORMACIÓN DE CONTACTO ── #}
+<section class="content-section">
+  <div class="contact-grid">
+    <div class="contact-card" data-aos="fade-up" data-aos-delay="0">
+      <div class="icon">📍</div>
+      <h3>Direccion</h3>
+      <p>Av. Monseñor Rivero #1234<br>Entre c.14 y c.15, Zona Centro<br>La Paz, Bolivia</p>
+    </div>
+
+    <div class="contact-card" data-aos="fade-up" data-aos-delay="80">
+      <div class="icon">📞</div>
+      <h3>Telefono</h3>
+      <a href="tel:+59170000000">+591 700 00000</a>
+      <a href="https://wa.me/59170000000" target="_blank" style="color: #3fb950;">WhatsApp &rarr;</a>
+    </div>
+
+    <div class="contact-card" data-aos="fade-up" data-aos-delay="160">
+      <div class="icon">✉️</div>
+      <h3>Email</h3>
+      <a href="mailto:info@fitlife.com.bo">info@fitlife.com.bo</a>
+      <p style="margin-top: 4px; font-size: 13px;">Respondemos en menos de 24h</p>
+    </div>
+
+    <div class="contact-card" data-aos="fade-up" data-aos-delay="240">
+      <div class="icon">🌐</div>
+      <h3>Redes Sociales</h3>
+      <a href="#">Instagram: @fitlife.bo</a>
+      <a href="#">Facebook: /FitLifeGym</a>
+      <a href="#">TikTok: @fitlife.bo</a>
+    </div>
+  </div>
+
+  {# ── HORARIOS ── #}
+  <div class="horarios-table" data-aos="fade-up" data-aos-delay="100">
+    <h3>Horarios de Atencion</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Dia</th>
+          <th>Horario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Lunes a Viernes</td><td class="hora">05:30 — 22:00</td></tr>
+        <tr><td>Sabados</td><td class="hora">07:00 — 20:00</td></tr>
+        <tr><td>Domingos</td><td class="hora">08:00 — 14:00</td></tr>
+        <tr><td>Feriados</td><td class="hora">08:00 — 14:00</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  {# ── MAPA VISUAL ── #}
+  <div class="mapa-section" data-aos="fade-up" data-aos-delay="100">
+    <div class="section-tag">Mapa</div>
+    <h2 class="section-title">Nuestra Ubicacion</h2>
+    <p class="section-sub">Estamos en pleno centro de la ciudad, facil acceso en transporte publico y vehiculo propio.</p>
+
+    <div class="mapa-wrap">
+      <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=-68.145,-16.505,-68.125,-16.485&layer=mapnik&marker=-16.4955,-68.1336"
+        loading="lazy"
+        title="Ubicacion FitLife Gym"
+      ></iframe>
+      <div class="mapa-overlay">
+        <div class="pin">Av. Monseñor Rivero #1234, La Paz</div>
+      </div>
+    </div>
+  </div>
+
+  {# ── CTA ── #}
+  <div class="ubicacion-cta" data-aos="fade-up" data-aos-delay="100">
+    <h2>Lista para <span>Empezar</span>?</h2>
+    <p>Visitanos sin cita previa. Te mostraremos nuestras instalaciones y te ayudaremos a elegir el plan ideal.</p>
+    <a href="{{ path('app_home') }}#precios" class="btn-primary">Ver Planes &rarr;</a>
+  </div>
+</section>
+{% endblock %}

@@ -21,7 +21,14 @@ security:
         main:
             lazy: true
             provider: app_personal_provider
-            custom_authenticator: App\Security\AppAuthenticator
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                csrf_token_id: authenticate
+                username_parameter: usuario
+                password_parameter: contrasena
+                default_target_path: /redirigir-login
             logout:
                 path: app_logout
                 target: app_home    # al cerrar sesión va al home público
@@ -34,6 +41,7 @@ security:
     access_control:
         # Rutas públicas (sin autenticación)
         - { path: ^/login$,   roles: PUBLIC_ACCESS }
+        - { path: ^/redirigir-login$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/$,        roles: PUBLIC_ACCESS }
 
         # Panel administrador

@@ -1,0 +1,460 @@
+{# templates/layouts/public.html.twig — Layout compartido para todas las páginas públicas #}
+{% extends 'layouts/base.html.twig' %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+/* ============================================= */
+/*  VARIABLES GLOBALES PÚBLICAS                  */
+/* ============================================= */
+:root {
+  --bg: #0a0a0a;
+  --text: #ffffff;
+  --muted: #999999;
+  --accent: #FFEA00;
+  --dark: #111111;
+  --darker: #0d0d0d;
+  --border: #1e1e1e;
+  --card: #151515;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ============================================= */
+/*  NAVBAR                                       */
+/* ============================================= */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: transparent;
+  backdrop-filter: none;
+  padding: 0 60px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+nav.scrolled {
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(16px);
+  border-radius: 60px;
+  width: calc(100% - 40px);
+  left: 20px;
+  top: 10px;
+  padding: 0 36px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-transform: uppercase;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.nav-logo span { color: var(--text); }
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+.nav-links a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  transition: color 0.3s ease;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+.nav-links a:hover { color: var(--accent); }
+.nav-links a:hover::after { width: 100%; }
+
+.btn-nav {
+  background: var(--accent);
+  color: #000;
+  padding: 11px 28px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 234, 0, 0.25);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.btn-nav:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 234, 0, 0.35);
+  color: #000;
+}
+
+/* Hamburguesa móvil */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 1001;
+}
+.menu-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text);
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+.menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.menu-toggle.active span:nth-child(2) { opacity: 0; }
+.menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* ============================================= */
+/*  PAGE HERO (sub-páginas)                     */
+/* ============================================= */
+.page-hero {
+  padding: 160px 60px 80px;
+  position: relative;
+  overflow: hidden;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+}
+.page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 30%, rgba(255,234,0,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+.page-hero .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+.page-tag {
+  display: inline-block;
+  background: rgba(255,234,0,0.12);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  padding: 6px 20px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+.page-hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(44px, 6vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.page-hero p {
+  color: var(--muted);
+  font-size: 18px;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+/* ============================================= */
+/*  BOTONES GLOBALES                             */
+/* ============================================= */
+.btn-primary {
+  display: inline-block;
+  background: var(--accent);
+  color: #000;
+  padding: 16px 40px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 24px rgba(255, 234, 0, 0.3);
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  transform: scale(1.05) translateY(-3px);
+  box-shadow: 0 10px 35px rgba(255, 234, 0, 0.4);
+  color: #000;
+}
+
+.btn-outline {
+  display: inline-block;
+  background: transparent;
+  color: var(--text);
+  padding: 16px 40px;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.btn-outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s;
+  margin-bottom: 20px;
+}
+.btn-back:hover { color: var(--accent); }
+
+/* ============================================= */
+/*  SECCIÓN GENÉRICA                            */
+/* ============================================= */
+.content-section {
+  padding: 80px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-tag {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5vw, 60px);
+  line-height: 1;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.section-sub {
+  color: var(--muted);
+  font-size: 17px;
+  max-width: 540px;
+  line-height: 1.5;
+}
+
+/* ============================================= */
+/*  TARJETAS GENÉRICAS                          */
+/* ============================================= */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 234, 0, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================= */
+/*  FOOTER                                       */
+/* ============================================= */
+footer {
+  background: var(--darker);
+  border-top: 1px solid var(--border);
+  padding: 60px 60px 30px;
+}
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 48px;
+}
+.footer-brand .nav-logo { margin-bottom: 12px; display: inline-block; }
+.footer-brand p { color: var(--muted); font-size: 14px; max-width: 320px; line-height: 1.6; }
+.footer-col h4 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+.footer-col a {
+  display: block;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--accent); }
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: #555;
+  font-size: 13px;
+}
+.footer-bottom strong { color: var(--accent); }
+
+/* ============================================= */
+/*  RESPONSIVE                                   */
+/* ============================================= */
+@media (max-width: 900px) {
+  nav { padding: 0 20px; }
+  nav.scrolled { padding: 0 20px; width: calc(100% - 16px); left: 8px; border-radius: 30px; }
+  .menu-toggle { display: flex; }
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.97);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    padding: 100px 32px 32px;
+    gap: 0;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 1px solid var(--border);
+  }
+  .nav-links.open { right: 0; }
+  .nav-links a {
+    font-size: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    display: block;
+  }
+  .nav-links a::after { display: none; }
+  .btn-nav { display: none; }
+  .page-hero { padding: 130px 20px 60px; }
+  .content-section { padding: 60px 20px; }
+  .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+  footer { padding: 40px 20px 20px; }
+}
+
+@media (max-width: 480px) {
+  .page-hero h1 { font-size: 36px; }
+  .btn-primary, .btn-outline { padding: 14px 28px; font-size: 14px; }
+}
+</style>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+{# ── NAVBAR ── #}
+<nav id="mainNav">
+  <a href="{{ path('app_home') }}" class="nav-logo">Fit<span>Life</span></a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="{{ path('app_home') }}#clases">Clases</a></li>
+    <li><a href="{{ path('app_home') }}#precios">Planes</a></li>
+    <li><a href="{{ path('app_maquinas') }}">Máquinas</a></li>
+    <li><a href="{{ path('app_ubicacion') }}">Contacto</a></li>
+    <li><a href="{{ path('app_ubicacion') }}" class="btn-nav" style="margin-top:8px;">Únete Ahora</a></li>
+  </ul>
+
+  <a href="{{ path('app_ubicacion') }}" class="btn-nav">Únete Ahora</a>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+{# ── CONTENIDO DE CADA PÁGINA ── #}
+{% block page_content %}{% endblock %}
+
+{# ── FOOTER ── #}
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="{{ path('app_home') }}" class="nav-logo">Fit<span>Life</span></a>
+      <p>Tu gimnasio de alto rendimiento. Entrenamiento de élite, instructores certificados y la comunidad más motivada de la ciudad.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navegación</h4>
+      <a href="{{ path('app_home') }}">Inicio</a>
+      <a href="{{ path('app_home') }}#clases">Clases</a>
+      <a href="{{ path('app_home') }}#precios">Planes</a>
+      <a href="{{ path('app_maquinas') }}">Máquinas</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <a href="{{ path('app_ubicacion') }}">Ubicación</a>
+      <a href="tel:+59170000000">+591 700 00000</a>
+      <a href="mailto:info@fitlife.com.bo">info@fitlife.com.bo</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; {{ "now"|date("Y") }} <strong>FitLife Gym</strong> — Todos los derechos reservados.</p>
+  </div>
+</footer>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 700, once: true, offset: 60 });
+
+  /* Navbar scroll */
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  /* Menú móvil */
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      navLinks.classList.toggle('open');
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        menuToggle.classList.remove('active');
+        navLinks.classList.remove('open');
+      });
+    });
+  }
+</script>
+{% endblock %}

@@ -12,7 +12,7 @@ class SecurityController extends AbstractController
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // Si ya está autenticado, redirige a su dashboard correspondiente
+        // Si ya hay sesion abierta, no volvemos a mostrar el formulario.
         if ($this->getUser()) {
             return $this->redirectToDashboard();
         }
@@ -26,15 +26,24 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    #[Route('/redirigir-login', name: 'app_login_redirect')]
+    public function loginRedirect(): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->redirectToDashboard();
+    }
+
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
-        // Este método nunca se ejecuta directamente.
-        // Symfony intercepta /logout según lo configurado en security.yaml.
+        // Symfony intercepta esta ruta; el metodo existe solo para declarar la ruta.
         throw new \LogicException('Gestionado por el firewall de Symfony.');
     }
 
-    /** Redirige al dashboard según el rol del usuario actual */
+    /** Punto unico para decidir a que panel entra cada usuario. */
     private function redirectToDashboard(): Response
     {
         $roles = $this->getUser()->getRoles();
